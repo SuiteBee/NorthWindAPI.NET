@@ -1,2 +1,2 @@
 # NorthWindData.NET
-REST API Data Layer Example
+REST API example utilizing a sqlite version of Microsoft NorthWind Database
