@@ -1,7 +1,6 @@
-using NorthWindAPI.Config;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using NorthWindAPI.Data.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;

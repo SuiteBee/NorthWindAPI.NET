@@ -1,8 +1,9 @@
-﻿namespace NorthWindAPI.Data.Models
+﻿using NorthWindAPI.Data.Resources;
+
+namespace NorthWindAPI.Data.Models
 {
-    public class Order
+    public class Order : Entity
     {
-        public int Id { get; set; }
         public string? CustomerId { get; set; }
         public int EmployeeId { get; set; }
         public string? OrderDate { get; set; }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-using NorthWindAPI.Config;
+using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.Models;
 
 namespace NorthWindAPI.Controllers

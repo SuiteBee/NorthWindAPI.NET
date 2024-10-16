@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using NorthWindAPI.Config;
+using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.Models;
+using NorthWindAPI.Data.Repositories;
 
 namespace NorthWindAPI.Controllers
 {
@@ -18,10 +19,17 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Order>>> GetOrdersAll()
+        //{
+        //    return await _context.Order.ToListAsync();
+        //}
+
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrdersAll()
+        public async Task<IEnumerable<Order>> GetOrdersGeneric()
         {
-            return await _context.Order.ToListAsync();
+            var baseOrder =  new BaseRepository<Order>(_context);
+            return await baseOrder.ReturnEntityListAsync();
         }
 
         [HttpGet("{id}")]
