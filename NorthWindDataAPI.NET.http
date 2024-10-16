@@ -1,0 +1,6 @@
+@NorthWindDataAPI.NET_HostAddress = http://localhost:5113
+
+GET {{NorthWindDataAPI.NET_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
