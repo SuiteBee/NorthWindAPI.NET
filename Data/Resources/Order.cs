@@ -1,6 +1,6 @@
 ﻿using NorthWindAPI.Data.Resources;
 
-namespace NorthWindAPI.Data.Models
+namespace NorthWindAPI.Data.Resources
 {
     public class Order : Entity
     {

@@ -1,8 +1,7 @@
-﻿namespace NorthWindAPI.Data.Models
+﻿namespace NorthWindAPI.Data.Resources
 {
-    public class Employee
+    public class Employee : Entity
     {
-        public int Id { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Title { get; set; }

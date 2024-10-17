@@ -1,8 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace NorthWindAPI.Services.Models
+﻿namespace NorthWindAPI.Services.Dto
 {
-    public class Employee
+    public class EmployeeDto
     {
         public int Id { get; set; }
         public required string FirstName { get; set; }

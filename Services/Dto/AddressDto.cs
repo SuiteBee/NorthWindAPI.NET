@@ -1,6 +1,6 @@
-﻿namespace NorthWindAPI.Services.Models
+﻿namespace NorthWindAPI.Services.Dto
 {
-    public class Address
+    public class AddressDto
     {
         public required string Street { get; set; }
         public required string City { get; set; }

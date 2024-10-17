@@ -1,8 +1,7 @@
-﻿namespace NorthWindAPI.Data.Models
+﻿namespace NorthWindAPI.Data.Resources
 {
-    public class OrderDetail
+    public class OrderDetail : EntityAlt
     {
-        public string? Id { get; set; }
         public int OrderId { get; set; }
         public int ProductId { get; set; }
         public decimal UnitPrice { get; set; }

@@ -1,6 +1,6 @@
-﻿namespace NorthWindAPI.Services.Models
+﻿namespace NorthWindAPI.Services.Dto
 {
-    public class Contact
+    public class ContactDto
     {
         public required string ContactName { get; set; }
         public required string ContactTitle { get; set; }

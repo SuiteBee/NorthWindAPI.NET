@@ -5,12 +5,12 @@ using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Data.Repositories
 {
-    public class BaseRepository<T> : IBaseRepository<T> where T : Entity
+    public class BaseAltRepository<T> : IBaseAltRepository<T> where T : EntityAlt
     {
         private readonly AppDbContext _context;
         private readonly DbSet<T> _dbSet;
 
-        public BaseRepository(AppDbContext context)
+        public BaseAltRepository(AppDbContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();
@@ -21,7 +21,7 @@ namespace NorthWindAPI.Data.Repositories
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T?> FindEntityAsync(int id)
+        public async Task<T?> FindEntityAsync(string id)
         {
             return await _dbSet.FindAsync(id);
         }
@@ -32,12 +32,12 @@ namespace NorthWindAPI.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> RemoveEntityAsync(int id)
+        public async Task<string?> RemoveEntityAsync(string id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
-                return -1;
+                return null;
             }
 
             _dbSet.Remove(entity);
@@ -46,9 +46,9 @@ namespace NorthWindAPI.Data.Repositories
             return id;
         }
 
-        public async Task<T?> UpdateEntityAsync(int id, T entity)
+        public async Task<T?> UpdateEntityAsync(string id, T entity)
         {
-            if( id != entity.Id)
+            if (id != entity.Id)
             {
                 return null;
             }
@@ -61,7 +61,7 @@ namespace NorthWindAPI.Data.Repositories
             }
             catch (DbUpdateConcurrencyException)
             {
-                if(!await _dbSet.AnyAsync(x => x.Id == id))
+                if (!await _dbSet.AnyAsync(x => x.Id == id))
                 {
                     return entity;
                 }

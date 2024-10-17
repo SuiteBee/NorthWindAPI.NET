@@ -1,8 +1,7 @@
-﻿namespace NorthWindAPI.Data.Models
+﻿namespace NorthWindAPI.Data.Resources
 {
-    public class Customer
+    public class Customer : EntityAlt
     {
-        public string? Id { get; set; }
         public string? CompanyName { get; set; }
         public string? ContactName { get; set; }
         public string? ContactTitle { get; set; }

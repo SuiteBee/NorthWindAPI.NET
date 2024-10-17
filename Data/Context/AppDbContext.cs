@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using NorthWindAPI.Data.Models;
+using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Data.Context
 {
