@@ -27,11 +27,11 @@ builder.Services.AddSwaggerGen(c =>
 
 //Repositories
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 //Services
 builder.Services.AddScoped<IOrderService, OrderService>();
-
-
 
 // Auto Mapper Config
 var mapperConfig = new MapperConfiguration(x =>

@@ -5,7 +5,7 @@
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? Title { get; set; }
-        public string? TitleCourtesy { get; set; }
+        public string? TitleOfCourtesy { get; set; }
         public string? BirthDate { get; set; }
         public string? HireDate { get; set; }
         public string? Address { get; set; }

@@ -3,11 +3,10 @@
     public class OrderDto
     {
         public int OrderId { get; set; }
-        public string? OrderDate { get; set; }
-        public ProductDto? Product { get; set; }
-        public CustomerDto? OrderedBy { get; set; }
-        public EmployeeDto? CompletedBy { get; set; }
-        public  ShippingDto? SendTo { get; set; }
-
+        public required string OrderDate { get; set; }
+        public List<ProductDto> Products { get; set; } = new List<ProductDto>();
+        public required CustomerDto OrderedBy { get; set; } = new CustomerDto();
+        public required EmployeeDto CompletedBy { get; set; } = new EmployeeDto();
+        public required ShippingDto SendTo { get; set; } = new ShippingDto();
     }
 }
