@@ -8,6 +8,7 @@ using NorthWindAPI.Services.Mappers;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Repositories;
+using AutoMapper.EquivalencyExpression;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -31,12 +32,15 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 
 //Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 
 // Auto Mapper Config
-var mapperConfig = new MapperConfiguration(x =>
+var mapperConfig = new MapperConfiguration(cfg =>
 {
-    x.AddProfile(new MappingOrder());
+    cfg.AddProfile(new MappingOrder());
+    cfg.AddCollectionMappers();
+    cfg.UseEntityFrameworkCoreModel<AppDbContext>();
 });
 
 IMapper mapper = mapperConfig.CreateMapper();

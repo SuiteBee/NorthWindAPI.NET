@@ -1,9 +1,10 @@
-﻿namespace NorthWindAPI.Services.Dto
+﻿namespace NorthWindAPI.Services.ResponseDto
 {
     public class OrderDto
     {
         public int OrderId { get; set; }
         public required string OrderDate { get; set; }
+        public decimal OrderTotal { get; set; }
         public List<ProductDto> Products { get; set; } = new List<ProductDto>();
         public required CustomerDto OrderedBy { get; set; } = new CustomerDto();
         public required EmployeeDto CompletedBy { get; set; } = new EmployeeDto();

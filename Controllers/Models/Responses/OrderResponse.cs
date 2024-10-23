@@ -1,4 +1,4 @@
-﻿using NorthWindAPI.Services.Dto;
+﻿using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Controllers.Models.Responses
 {

@@ -8,8 +8,8 @@ namespace NorthWindAPI.Data.Repositories
     public class OrderRepository : IOrderRepository
     {
         private readonly AppDbContext _context;
-        private IBaseRepository<Order> _baseOrderRepo;
-        private IBaseAltRepository<OrderDetail> _baseDetailRepo;
+        private readonly IBaseRepository<Order> _baseOrderRepo;
+        private readonly IBaseAltRepository<OrderDetail> _baseDetailRepo;
 
         public OrderRepository(AppDbContext context)
         {
@@ -18,24 +18,52 @@ namespace NorthWindAPI.Data.Repositories
             _baseDetailRepo = new BaseAltRepository<OrderDetail>(_context);
         }
 
-        private IQueryable<OrderDetail> QueryOrderDetails()
+        #region " Queryable "
+
+            private IQueryable<OrderDetail> QueryOrderDetails()
+            {
+                return _context.OrderDetail.AsQueryable();
+            }
+
+            private IQueryable<Product> QueryProducts()
+            {
+                return _context.Product.AsQueryable();
+            }
+
+            private IQueryable<Category> QueryCategories()
+            {
+                return _context.Category.AsQueryable();
+            }
+
+            private IQueryable<Shipper> QueryShippers()
+            {
+                return _context.Shipper.AsQueryable();
+            }
+
+        #endregion
+
+        public async Task<IEnumerable<Order>> AllOrders()
         {
-            return _context.OrderDetail.AsQueryable();
+            return await _baseOrderRepo.ReturnEntityListAsync();
         }
 
-        private IQueryable<Product> QueryProducts()
+        public async Task<IEnumerable<OrderDetail>> AllDetails()
         {
-            return _context.Product.AsQueryable();
+            return await _baseDetailRepo.ReturnEntityListAsync();
+        }
+        public async Task<IEnumerable<Product>> AllProducts()
+        {
+            return await _context.Product.ToListAsync();
         }
 
-        private IQueryable<Category> QueryCategories()
+        public async Task<IEnumerable<Category>> AllCategories()
         {
-            return _context.Category.AsQueryable();
+            return await _context.Category.ToListAsync();
         }
 
-        private IQueryable<Shipper> QueryShippers()
+        public async Task<IEnumerable<Shipper>> AllCarriers()
         {
-            return _context.Shipper.AsQueryable();
+            return await _context.Shipper.ToListAsync();
         }
 
         public async Task<Order?> FindOrder(int id)

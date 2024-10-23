@@ -2,7 +2,7 @@
 using NorthWindAPI.Controllers;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
-using NorthWindAPI.Services.Dto;
+using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 
 namespace NorthWindAPI.Services
@@ -14,9 +14,9 @@ namespace NorthWindAPI.Services
         private readonly ICustomerRepository _customerRepository;
 
         private readonly IMapper _mapper;
-        private readonly ILogger<OrderController> _logger;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IOrderRepository orderRepository, IEmployeeRepository employeeRepository, ICustomerRepository customerRepository, IMapper mapper, ILogger<OrderController> logger)
+        public OrderService(IOrderRepository orderRepository, IEmployeeRepository employeeRepository, ICustomerRepository customerRepository, IMapper mapper, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _employeeRepository = employeeRepository;
@@ -24,6 +24,55 @@ namespace NorthWindAPI.Services
 
             _mapper = mapper;
             _logger = logger;
+        }
+
+        public async Task<IEnumerable<OrderDto>> ListOrders()
+        {
+            var orderList = await _orderRepository.AllOrders();
+            var detailList = await _orderRepository.AllDetails();
+            var productList = await _orderRepository.AllProducts();
+            var categoryList = await _orderRepository.AllCategories();
+            var employeeList = await _employeeRepository.AllEmployees();
+            var carrierList = await _orderRepository.AllCarriers();
+            var customerList = await _customerRepository.AllCustomers();
+
+            var orderDto = _mapper.Map<IEnumerable<OrderDto>>(orderList);
+
+            foreach(OrderDto dto in orderDto)
+            {
+                var order = orderList.First(x => x.Id == dto.OrderId);
+                _mapper.Map(order, dto.SendTo);
+                _mapper.Map(order, dto.SendTo.Address);
+
+                var detailsDto = detailList.Where(x => x.OrderId == dto.OrderId);
+                foreach(OrderDetail detail in detailsDto)
+                {
+                    Product prod = productList.First(x => x.Id == detail.ProductId);
+                    Category cat = categoryList.First(x => x.Id == prod.CategoryId);
+
+                    ProductDto prodDto = _mapper.Map<ProductDto>(prod);
+                    _mapper.Map(cat, prodDto);
+                    _mapper.Map(detail, prodDto);
+
+                    CalculateProductTotals(prodDto);
+
+                    dto.Products.Add(prodDto);
+                }
+
+                var completedBy = employeeList.First(x => x.Id == order.EmployeeId);
+                _mapper.Map(completedBy, dto.CompletedBy);
+
+                var shippedBy = carrierList.First(x => x.Id == order.ShipVia);
+                _mapper.Map(shippedBy, dto.SendTo);
+
+                var orderedBy = customerList.First(x => x.Id == order.CustomerId);
+                _mapper.Map(orderedBy, dto.OrderedBy);
+                _mapper.Map(orderedBy, dto.OrderedBy.ContactInfo);
+
+                CalculateOrderTotal(dto);
+            }
+
+            return orderDto;
         }
 
         public async Task<OrderDto> FindOrder(int id)
@@ -40,15 +89,11 @@ namespace NorthWindAPI.Services
                 Product prod = await _orderRepository.FindProduct(detail.ProductId);
                 Category cat = await _orderRepository.FindCategory(prod.CategoryId);
 
-                ProductDto prodDto = new ProductDto()
-                {
-                    ProductName = prod.ProductName,
-                    CategoryName = cat.CategoryName,
-                    ItemPrice = prod.UnitPrice,
-                    Quantity = detail.Quantity,
-                    FinalPrice = detail.UnitPrice,
-                    Discount = detail.Discount
-                };
+                ProductDto prodDto = _mapper.Map<ProductDto>(prod);
+                _mapper.Map(cat, prodDto);
+                _mapper.Map(detail, prodDto);
+
+                CalculateProductTotals(prodDto);
 
                  orderDto.Products.Add(prodDto);
             };
@@ -63,7 +108,48 @@ namespace NorthWindAPI.Services
             _mapper.Map(orderedBy, orderDto.OrderedBy);
             _mapper.Map(orderedBy, orderDto.OrderedBy.ContactInfo);
 
+            CalculateOrderTotal(orderDto);
+
             return orderDto;
         }
+
+        //public async Task<OrderDto> NewOrder(OrderDto dto)
+        //{
+
+        //}
+
+        #region " Business Logic "
+
+        private void CalculateOrderTotal(OrderDto dto)
+        {
+            var prodTotal = dto.Products.Sum(x => x.FinalPrice);
+            dto.OrderTotal = prodTotal + dto.SendTo.ShipCost;
+        }
+
+        private void CalculateProductTotals(ProductDto dto)
+        {
+            dto.TotalPrice = GetTotalPrice(dto);
+            dto.FinalPrice = GetFinalPrice(dto);
+        }
+
+        private decimal GetTotalPrice(ProductDto dto)
+        {
+            return Math.Round(dto.PurchasePrice * dto.Quantity, 2);
+        }
+
+        private decimal GetFinalPrice(ProductDto dto)
+        {
+            if(dto.Discount > 0)
+            {
+                decimal finalPrice = dto.TotalPrice * (decimal)(1 - dto.Discount);
+                return Math.Round(finalPrice, 2);
+            }
+            else
+            {
+                return dto.TotalPrice;
+            }
+        }
+
+        #endregion
     }
 }

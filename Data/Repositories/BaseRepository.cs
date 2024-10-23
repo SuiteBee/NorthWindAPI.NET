@@ -18,7 +18,7 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<IEnumerable<T>> ReturnEntityListAsync()
         {
-            return await _dbSet.ToListAsync();
+                return await _dbSet.ToListAsync();
         }
 
         public async Task<T?> FindEntityAsync(int id)

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
+using AutoMapper.EquivalencyExpression;
 using NorthWindAPI.Data.Resources;
-using NorthWindAPI.Services.Dto;
+using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services.Mappers
 {
@@ -23,6 +24,12 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.PostalCode, o => o.MapFrom(s => s.ShipPostalCode))
                 .ForMember(d => d.Country, o => o.MapFrom(s => s.ShipCountry))
                 .ForMember(d => d.Region, o => o.MapFrom(s => s.ShipRegion));
+
+            CreateMap<Product, ProductDto>();
+
+            CreateMap<Category, ProductDto>();
+            CreateMap<OrderDetail, ProductDto>()
+                .ForMember(d => d.PurchasePrice, o => o.MapFrom(s => s.UnitPrice));
 
             CreateMap<Employee, EmployeeDto>();
 

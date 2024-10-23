@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthWindAPI.Services;
-using NorthWindAPI.Services.Dto;
+using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 
 namespace NorthWindAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/[controller]/[Action]")]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
@@ -31,8 +30,19 @@ namespace NorthWindAPI.Controllers
         //    return await baseOrder.ReturnEntityListAsync();
         //}
 
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> AllOrders()
+        {
+            var orders = await _orderService.ListOrders();
+            if (orders == null || !orders.Any())
+            {
+                return NotFound();
+            }
+            return orders.ToList();
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> GetOrderById(int id)
+        public async Task<ActionResult<OrderDto>> OrderById(int id)
         {
             var order = await _orderService.FindOrder(id);
             if(order == null)
@@ -41,6 +51,7 @@ namespace NorthWindAPI.Controllers
             }
             return order;
         }
+
 
         //[HttpPost]
         //public async Task<ActionResult<Order>> PostOrder(Order newOrder)

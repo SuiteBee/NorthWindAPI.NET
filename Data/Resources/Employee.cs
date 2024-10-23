@@ -16,6 +16,6 @@
         public string? HomePhone { get; set; }
         public string? Extension { get; set; }
         public string? Notes { get; set; }
-        public int ReportsTo { get; set; }
+        public int? ReportsTo { get; set; }
     }
 }

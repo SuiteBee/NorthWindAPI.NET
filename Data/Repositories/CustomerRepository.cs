@@ -1,4 +1,5 @@
-﻿using NorthWindAPI.Data.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 
@@ -7,7 +8,7 @@ namespace NorthWindAPI.Data.Repositories
     public class CustomerRepository : ICustomerRepository
     {
         private readonly AppDbContext _context;
-        private IBaseAltRepository<Customer> _baseCustomerRepo;
+        private readonly IBaseAltRepository<Customer> _baseCustomerRepo;
 
         public CustomerRepository(AppDbContext context)
         {
@@ -18,6 +19,11 @@ namespace NorthWindAPI.Data.Repositories
         public async Task<Customer?> FindCustomer(string id)
         {
             return await _baseCustomerRepo.FindEntityAsync(id);
+        }
+
+        public async Task<IEnumerable<Customer>> AllCustomers()
+        {
+            return await _baseCustomerRepo.ReturnEntityListAsync();
         }
     }
 }

@@ -5,5 +5,6 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
     public interface ICustomerRepository
     {
         public Task<Customer?> FindCustomer(string id);
+        public Task<IEnumerable<Customer>> AllCustomers();
     }
 }

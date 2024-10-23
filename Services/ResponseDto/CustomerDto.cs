@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace NorthWindAPI.Services.Dto
+namespace NorthWindAPI.Services.ResponseDto
 {
     public class CustomerDto
     {
