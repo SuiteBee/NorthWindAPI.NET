@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
-using NorthWindAPI.Controllers;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
+using NorthWindAPI.Controllers.Models.Requests;
 
 namespace NorthWindAPI.Services
 {
@@ -15,6 +15,8 @@ namespace NorthWindAPI.Services
 
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
+
+        private readonly string dateFormat = "yyyy-MM-dd";
 
         public OrderService(IOrderRepository orderRepository, IEmployeeRepository employeeRepository, ICustomerRepository customerRepository, IMapper mapper, ILogger<OrderService> logger)
         {
@@ -95,7 +97,7 @@ namespace NorthWindAPI.Services
 
                 CalculateProductTotals(prodDto);
 
-                 orderDto.Products.Add(prodDto);
+                orderDto.Products.Add(prodDto);
             };
 
             var completedBy = await _employeeRepository.FindEmployee(orderBase.EmployeeId);
@@ -111,12 +113,35 @@ namespace NorthWindAPI.Services
             CalculateOrderTotal(orderDto);
 
             return orderDto;
+
         }
 
-        //public async Task<OrderDto> NewOrder(OrderDto dto)
-        //{
+        public async Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder)
+        {
+            var toInsert = _mapper.Map<Order>(newOrder);
+            _mapper.Map(newOrder.Address, toInsert);
 
-        //}
+            var orderDate = DateTime.Today;
+            var orderDateString = orderDate.ToString(dateFormat);
+            toInsert.OrderDate = orderDateString;
+            toInsert.RequiredDate = orderDate.AddDays(28).ToString(dateFormat);
+
+            var inserted = await _orderRepository.InsertOrder(toInsert);
+
+            foreach(var detail in newOrder.OrderDetail)
+            {
+                Product prod = await _orderRepository.FindProduct(detail.ProductId);
+
+                var toInsertDetail = _mapper.Map<OrderDetail>(detail);
+                toInsertDetail.Id = $"{inserted.Id}/{detail.ProductId}";
+                toInsertDetail.OrderId = inserted.Id;
+                toInsertDetail.UnitPrice = prod.UnitPrice;
+
+                await _orderRepository.InsertDetail(toInsertDetail);
+            }
+
+            return await FindOrder(inserted.Id);
+        }
 
         #region " Business Logic "
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
+using NorthWindAPI.Controllers.Models.Requests;
 
 namespace NorthWindAPI.Controllers
 {
@@ -17,19 +18,6 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
-        //[HttpGet]
-        //public async Task<ActionResult<IEnumerable<Order>>> GetOrdersAll()
-        //{
-        //    return await _context.Order.ToListAsync();
-        //}
-
-        //[HttpGet]
-        //public async Task<IEnumerable<Order>> GetOrdersGeneric()
-        //{
-        //    var baseOrder =  new BaseRepository<Order>(_context);
-        //    return await baseOrder.ReturnEntityListAsync();
-        //}
-
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderDto>>> AllOrders()
         {
@@ -38,6 +26,7 @@ namespace NorthWindAPI.Controllers
             {
                 return NotFound();
             }
+
             return orders.ToList();
         }
 
@@ -52,15 +41,12 @@ namespace NorthWindAPI.Controllers
             return order;
         }
 
-
-        //[HttpPost]
-        //public async Task<ActionResult<Order>> PostOrder(Order newOrder)
-        //{
-        //    _context.Order.Add(newOrder);
-        //    await _context.SaveChangesAsync();
-
-        //    return CreatedAtAction(nameof(GetOrderById), new { id = newOrder.Id }, newOrder);
-        //}
+        [HttpPost]
+        public async Task<ActionResult<OrderDto>> Insert(NewOrderRequest newOrder)
+        {
+            var order = await _orderService.ProcessNewOrder(newOrder);
+            return order;
+        }
 
         //[HttpDelete("{id}")]
         //public async Task<IActionResult> DeleteOrder(int id)

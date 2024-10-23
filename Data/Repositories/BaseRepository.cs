@@ -26,10 +26,12 @@ namespace NorthWindAPI.Data.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task AddEntityAsync(T entity)
+        public async Task<T> AddEntityAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
             await _context.SaveChangesAsync();
+
+            return entity;
         }
 
         public async Task<int> RemoveEntityAsync(int id)

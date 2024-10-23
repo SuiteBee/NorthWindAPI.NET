@@ -5,9 +5,9 @@ using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services.Mappers
 {
-    public class MappingOrder : Profile
+    public class OrderDtoMap : Profile
     {
-        public MappingOrder()
+        public OrderDtoMap()
         {
             CreateMap<Order, OrderDto>()
                 .ForMember(d => d.OrderId, o => o.MapFrom(s => s.Id));

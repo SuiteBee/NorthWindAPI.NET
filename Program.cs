@@ -34,11 +34,15 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 //Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 // Auto Mapper Config
 var mapperConfig = new MapperConfiguration(cfg =>
 {
-    cfg.AddProfile(new MappingOrder());
+    cfg.AddProfile(new OrderDtoMap());
+    cfg.AddProfile(new OrderRequestMap());
+    cfg.AddProfile(new CustomerRequestMap());
+
     cfg.AddCollectionMappers();
     cfg.UseEntityFrameworkCoreModel<AppDbContext>();
 });

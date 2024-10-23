@@ -1,4 +1,5 @@
-﻿using NorthWindAPI.Services.ResponseDto;
+﻿using NorthWindAPI.Controllers.Models.Requests;
+using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services.Interfaces
 {
@@ -6,6 +7,7 @@ namespace NorthWindAPI.Services.Interfaces
     {
         public Task<IEnumerable<OrderDto>> ListOrders();
         public Task<OrderDto> FindOrder(int id);
+        public Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder);
     }
 }
 

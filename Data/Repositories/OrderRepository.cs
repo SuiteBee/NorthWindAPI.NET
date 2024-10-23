@@ -18,7 +18,60 @@ namespace NorthWindAPI.Data.Repositories
             _baseDetailRepo = new BaseAltRepository<OrderDetail>(_context);
         }
 
-        #region " Queryable "
+        #region " GET ALL "
+
+            public async Task<IEnumerable<Order>> AllOrders()
+            {
+                return await _baseOrderRepo.ReturnEntityListAsync();
+            }
+
+            public async Task<IEnumerable<OrderDetail>> AllDetails()
+            {
+                return await _baseDetailRepo.ReturnEntityListAsync();
+            }
+            public async Task<IEnumerable<Product>> AllProducts()
+            {
+                return await _context.Product.ToListAsync();
+            }
+
+            public async Task<IEnumerable<Category>> AllCategories()
+            {
+                return await _context.Category.ToListAsync();
+            }
+
+            public async Task<IEnumerable<Shipper>> AllCarriers()
+            {
+                return await _context.Shipper.ToListAsync();
+            }
+
+        #endregion
+
+        #region " GET "
+
+            public async Task<Order?> FindOrder(int id)
+            {
+                return await _baseOrderRepo.FindEntityAsync(id);
+            }
+
+            public async Task<List<OrderDetail>> FindDetail(int orderId)
+            {
+                return await QueryOrderDetails().Where(x => x.OrderId == orderId).ToListAsync();
+            }
+
+            public async Task<Product> FindProduct(int productId)
+            {
+                return await QueryProducts().Where(x => x.Id == productId).FirstAsync();
+            }
+
+            public async Task<Category> FindCategory(int categoryId)
+            {
+                return await QueryCategories().Where(x => x.Id == categoryId).FirstAsync();
+            }
+
+            public async Task<Shipper> FindCarrier(int shipperId)
+            {
+                return await QueryShippers().Where(x => x.Id == shipperId).FirstAsync();
+            }
 
             private IQueryable<OrderDetail> QueryOrderDetails()
             {
@@ -42,56 +95,21 @@ namespace NorthWindAPI.Data.Repositories
 
         #endregion
 
-        public async Task<IEnumerable<Order>> AllOrders()
-        {
-            return await _baseOrderRepo.ReturnEntityListAsync();
-        }
+        #region " POST "
 
-        public async Task<IEnumerable<OrderDetail>> AllDetails()
-        {
-            return await _baseDetailRepo.ReturnEntityListAsync();
-        }
-        public async Task<IEnumerable<Product>> AllProducts()
-        {
-            return await _context.Product.ToListAsync();
-        }
+            public async Task<OrderDetail> InsertDetail(OrderDetail detail)
+            {
+                return await _baseDetailRepo.AddEntityAsync(detail);
+            }
 
-        public async Task<IEnumerable<Category>> AllCategories()
-        {
-            return await _context.Category.ToListAsync();
-        }
+            public async Task<Order> InsertOrder(Order order)
+            {
+                return await _baseOrderRepo.AddEntityAsync(order);
+            }
 
-        public async Task<IEnumerable<Shipper>> AllCarriers()
-        {
-            return await _context.Shipper.ToListAsync();
-        }
+        #endregion
 
-        public async Task<Order?> FindOrder(int id)
-        {
-            return await _baseOrderRepo.FindEntityAsync(id);
-        }
 
-        public async Task<List<OrderDetail>> FindDetail(int orderId)
-        {
-            return await QueryOrderDetails().Where(x => x.OrderId == orderId).ToListAsync();
-        }
-
-        public async Task<Product> FindProduct(int productId)
-        {
-            return await QueryProducts().Where(x => x.Id == productId).FirstAsync();
-        }
-
-        public async Task<Category> FindCategory(int categoryId)
-        {
-            return await QueryCategories().Where(x => x.Id == categoryId).FirstAsync();
-        }
-
-        public async Task<Shipper> FindCarrier(int shipperId)
-        {
-            return await QueryShippers().Where(x => x.Id == shipperId).FirstAsync();
-        }
-
-        
         //public async Task<List<object>> FindFullOrder(int id)
         //{
         //    var sqlRaw =
