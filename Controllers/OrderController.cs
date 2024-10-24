@@ -2,6 +2,8 @@
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
+using NorthWindAPI.Services;
+using System.Runtime.InteropServices;
 
 namespace NorthWindAPI.Controllers
 {
@@ -19,7 +21,7 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> AllOrders()
+        public async Task<ActionResult<IEnumerable<OrderDto>>> All()
         {
             var orders = await _orderService.ListOrders();
             if (orders == null || !orders.Any())
@@ -31,36 +33,45 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> OrderById(int id)
+        public async Task<ActionResult<OrderDto>> Find(int id)
         {
             var order = await _orderService.FindOrder(id);
             if(order == null)
             {
-                return NotFound();
+                return NotFound(id);
             }
             return order;
         }
 
         [HttpPost]
-        public async Task<ActionResult<OrderDto>> Insert(NewOrderRequest newOrder)
+        public async Task<ActionResult<OrderDto>> Create(NewOrderRequest newOrder)
         {
             var order = await _orderService.ProcessNewOrder(newOrder);
             return order;
         }
 
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteOrder(int id)
-        //{
-        //    var order = await _context.Order.FindAsync(id);
-        //    if (order == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [HttpPut("{id}")]
+        public async Task<ActionResult<OrderDto>> Ship(int id, string? shipDate = null)
+        {
+            return await _orderService.MarkAsShipped(id, shipDate);
+        }
 
-        //    _context.Order.Remove(order);
-        //    await _context.SaveChangesAsync();
+        [HttpPut]
+        public async Task<ActionResult<IEnumerable<OrderDto>>> ShipMany(ShipRequest orders)
+        {
+            var shippedOrders = await _orderService.MarkAsShipped(orders);
+            return shippedOrders.ToList();
+        }
 
-        //    return NoContent();
-        //}
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var result = await _orderService.RemoveOrder(id);
+            if (!result)
+            {
+                return BadRequest();
+            }
+            return NoContent();
+        }
     }
 }

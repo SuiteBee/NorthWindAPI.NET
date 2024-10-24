@@ -26,7 +26,7 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update(AuthUpdateRequest credentials)
+        public async Task<ActionResult> Update(AuthUpdateRequest credentials)
         {
             bool success = await _authService.ChangePass(credentials.usr, credentials.pwd, credentials.newPwd);
             if (success) return Accepted();

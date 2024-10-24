@@ -34,18 +34,57 @@ namespace NorthWindAPI.Data.Repositories
             return entity;
         }
 
-        public async Task<string?> RemoveEntityAsync(string id)
+        /// <summary>
+        /// Delete entity and save changes to database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> RemoveEntityAsync(string id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
-                return null;
+                return false;
             }
 
-            _dbSet.Remove(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _dbSet.Remove(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                return false;
+            }
+            
 
-            return id;
+            return true;
+        }
+
+        /// <summary>
+        /// Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public async Task<bool> RemoveDependentEntityAsync(string id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _dbSet.Remove(entity);
+            }
+            catch
+            {
+                return false;
+            }
+
+
+            return true;
         }
 
         public async Task<T?> UpdateEntityAsync(string id, T entity)
@@ -75,5 +114,6 @@ namespace NorthWindAPI.Data.Repositories
 
             return await _dbSet.FindAsync(id);
         }
+
     }
 }

@@ -4,6 +4,7 @@ using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
+using System.Reflection.Metadata.Ecma335;
 
 namespace NorthWindAPI.Services
 {
@@ -77,10 +78,10 @@ namespace NorthWindAPI.Services
             return orderDto;
         }
 
-        public async Task<OrderDto> FindOrder(int id)
+        public async Task<OrderDto> FindOrder(int orderId)
         {
-            var orderBase = await _orderRepository.FindOrder(id);
-            var orderDetails = await _orderRepository.FindDetail(id);
+            var orderBase = await _orderRepository.FindOrder(orderId);
+            var orderDetails = await _orderRepository.FindDetail(orderId);
 
             var orderDto = _mapper.Map<OrderDto>(orderBase);
             _mapper.Map(orderBase, orderDto.SendTo);
@@ -141,6 +142,37 @@ namespace NorthWindAPI.Services
             }
 
             return await FindOrder(inserted.Id);
+        }
+
+        public async Task<OrderDto> MarkAsShipped(int orderId, string? shippedDate = null)
+        {
+            var orderBase = await _orderRepository.FindOrder(orderId);
+
+            DateTime shipDate = shippedDate == null ? DateTime.Today : DateTime.Parse(shippedDate);
+            var shipDateString = shipDate.ToString(dateFormat);
+            orderBase.ShippedDate = shipDateString;
+
+            await _orderRepository.UpdateOrder(orderId, orderBase);
+            return await FindOrder(orderId);
+        }
+
+        public async Task<IEnumerable<OrderDto>> MarkAsShipped(ShipRequest orders)
+        {
+            var toReturn = new List<OrderDto>();
+
+            foreach(int order in orders.OrderIds)
+            {
+                
+                var shipped = await MarkAsShipped(order, orders.ShipDate);
+                toReturn.Add(shipped);
+            }
+
+            return toReturn;
+        }
+
+        public async Task<bool> RemoveOrder(int orderId)
+        {
+            return await _orderRepository.DeleteOrder(orderId);
         }
 
         #region " Business Logic "

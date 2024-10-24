@@ -19,7 +19,7 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<CustomerDto>>> AllCustomers()
+        public async Task<ActionResult<IEnumerable<CustomerDto>>> All()
         {
             var customers = await _customerService.ListCustomers();
             if (customers == null || !customers.Any())
@@ -31,7 +31,7 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<CustomerDto>> CustomerById(string id)
+        public async Task<ActionResult<CustomerDto>> Find(string id)
         {
             var customer = await _customerService.FindCustomer(id);
             if (customer == null)
@@ -42,7 +42,7 @@ namespace NorthWindAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<CustomerDto>> Insert(NewCustomerRequest newCustomer)
+        public async Task<ActionResult<CustomerDto>> Create(NewCustomerRequest newCustomer)
         {
             var customer = await _customerService.ProcessNewCustomer(newCustomer);
             return customer;

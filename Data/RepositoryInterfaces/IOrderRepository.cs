@@ -18,5 +18,9 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
 
         public Task<OrderDetail> InsertDetail(OrderDetail detail);
         public Task<Order> InsertOrder(Order order);
+
+        public Task<Order> UpdateOrder(int orderId, Order order);
+
+        public Task<bool> DeleteOrder(int id);
     }
 }
