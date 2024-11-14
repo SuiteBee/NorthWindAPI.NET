@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.EquivalencyExpression;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -25,10 +24,12 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.Country, o => o.MapFrom(s => s.ShipCountry))
                 .ForMember(d => d.Region, o => o.MapFrom(s => s.ShipRegion));
 
-            CreateMap<Product, ProductDto>();
+            
+            CreateMap<Product, OrderItemDto>();
 
-            CreateMap<Category, ProductDto>();
-            CreateMap<OrderDetail, ProductDto>()
+            CreateMap<Category, OrderItemDto>();
+
+            CreateMap<OrderDetail, OrderItemDto>()
                 .ForMember(d => d.PurchasePrice, o => o.MapFrom(s => s.UnitPrice));
 
             CreateMap<Employee, EmployeeDto>();

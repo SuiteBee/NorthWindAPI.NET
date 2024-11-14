@@ -6,23 +6,17 @@ namespace NorthWindAPI.Services.ResponseDto
     {
         public required string ProductName { get; set; }
         public required string CategoryName { get; set; }
-        public decimal PurchasePrice { get; set; }
-        public int Quantity { get; set; }
-        public decimal TotalPrice { get; set; }
-        public double Discount { get; set; }
-        public decimal FinalPrice { get; set; }
+        public required string CategoryDescription { get; set; }
+        public decimal ItemPrice { get; set; }
+        public required SupplierDto Supplier { get; set; } = new SupplierDto();
 
         [SetsRequiredMembers]
         public ProductDto()
         {
             ProductName = "";
             CategoryName = "";
-            PurchasePrice = 0M;
-            Quantity = 0;
-            TotalPrice = 0M;
-            Discount = .00;
-            FinalPrice = 0M;
+            CategoryDescription = "";
+            ItemPrice = 0M;
         }
-
     }
 }

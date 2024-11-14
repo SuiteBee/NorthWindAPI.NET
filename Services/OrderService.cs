@@ -4,7 +4,6 @@ using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
-using System.Reflection.Metadata.Ecma335;
 
 namespace NorthWindAPI.Services
 {
@@ -13,17 +12,24 @@ namespace NorthWindAPI.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IEmployeeRepository _employeeRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IProductRepository _productRepository;
 
         private readonly IMapper _mapper;
         private readonly ILogger<OrderService> _logger;
 
         private readonly string dateFormat = "yyyy-MM-dd";
 
-        public OrderService(IOrderRepository orderRepository, IEmployeeRepository employeeRepository, ICustomerRepository customerRepository, IMapper mapper, ILogger<OrderService> logger)
+        public OrderService(
+            IOrderRepository orderRepository, 
+            IEmployeeRepository employeeRepository, 
+            ICustomerRepository customerRepository,
+            IProductRepository productRepository,
+            IMapper mapper, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _employeeRepository = employeeRepository;
             _customerRepository = customerRepository;
+            _productRepository = productRepository;
 
             _mapper = mapper;
             _logger = logger;
@@ -33,8 +39,8 @@ namespace NorthWindAPI.Services
         {
             var orderList = await _orderRepository.AllOrders();
             var detailList = await _orderRepository.AllDetails();
-            var productList = await _orderRepository.AllProducts();
-            var categoryList = await _orderRepository.AllCategories();
+            var productList = await _productRepository.AllProducts();
+            var categoryList = await _productRepository.AllCategories();
             var employeeList = await _employeeRepository.AllEmployees();
             var carrierList = await _orderRepository.AllCarriers();
             var customerList = await _customerRepository.AllCustomers();
@@ -53,7 +59,7 @@ namespace NorthWindAPI.Services
                     Product prod = productList.First(x => x.Id == detail.ProductId);
                     Category cat = categoryList.First(x => x.Id == prod.CategoryId);
 
-                    ProductDto prodDto = _mapper.Map<ProductDto>(prod);
+                    OrderItemDto prodDto = _mapper.Map<OrderItemDto>(prod);
                     _mapper.Map(cat, prodDto);
                     _mapper.Map(detail, prodDto);
 
@@ -89,10 +95,10 @@ namespace NorthWindAPI.Services
 
             foreach (OrderDetail detail in orderDetails)
             {
-                Product prod = await _orderRepository.FindProduct(detail.ProductId);
-                Category cat = await _orderRepository.FindCategory(prod.CategoryId);
+                Product prod = await _productRepository.FindProduct(detail.ProductId);
+                Category cat = await _productRepository.FindCategory(prod.CategoryId);
 
-                ProductDto prodDto = _mapper.Map<ProductDto>(prod);
+                OrderItemDto prodDto = _mapper.Map<OrderItemDto>(prod);
                 _mapper.Map(cat, prodDto);
                 _mapper.Map(detail, prodDto);
 
@@ -131,7 +137,7 @@ namespace NorthWindAPI.Services
 
             foreach(var detail in newOrder.OrderDetail)
             {
-                Product prod = await _orderRepository.FindProduct(detail.ProductId);
+                Product prod = await _productRepository.FindProduct(detail.ProductId);
 
                 var toInsertDetail = _mapper.Map<OrderDetail>(detail);
                 toInsertDetail.Id = $"{inserted.Id}/{detail.ProductId}";
@@ -183,18 +189,18 @@ namespace NorthWindAPI.Services
             dto.OrderTotal = prodTotal + dto.SendTo.ShipCost;
         }
 
-        private void CalculateProductTotals(ProductDto dto)
+        private void CalculateProductTotals(OrderItemDto dto)
         {
             dto.TotalPrice = GetTotalPrice(dto);
             dto.FinalPrice = GetFinalPrice(dto);
         }
 
-        private decimal GetTotalPrice(ProductDto dto)
+        private decimal GetTotalPrice(OrderItemDto dto)
         {
             return Math.Round(dto.PurchasePrice * dto.Quantity, 2);
         }
 
-        private decimal GetFinalPrice(ProductDto dto)
+        private decimal GetFinalPrice(OrderItemDto dto)
         {
             if(dto.Discount > 0)
             {

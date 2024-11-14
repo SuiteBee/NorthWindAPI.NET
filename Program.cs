@@ -30,12 +30,14 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 //Services
 builder.Services.AddCors();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Auto Mapper Config
 var mapperConfig = new MapperConfiguration(cfg =>
@@ -43,6 +45,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new OrderDtoMap());
     cfg.AddProfile(new OrderRequestMap());
     cfg.AddProfile(new CustomerRequestMap());
+    cfg.AddProfile(new ProductDtoMap());
 
     cfg.AddCollectionMappers();
     cfg.UseEntityFrameworkCoreModel<AppDbContext>();

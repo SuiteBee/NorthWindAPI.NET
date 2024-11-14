@@ -29,15 +29,6 @@ namespace NorthWindAPI.Data.Repositories
         {
             return await _baseDetailRepo.ReturnEntityListAsync();
         }
-        public async Task<IEnumerable<Product>> AllProducts()
-        {
-            return await _context.Product.ToListAsync();
-        }
-
-        public async Task<IEnumerable<Category>> AllCategories()
-        {
-            return await _context.Category.ToListAsync();
-        }
 
         public async Task<IEnumerable<Shipper>> AllCarriers()
         {
@@ -58,15 +49,6 @@ namespace NorthWindAPI.Data.Repositories
             return await QueryOrderDetails().Where(x => x.OrderId == orderId).ToListAsync();
         }
 
-        public async Task<Product> FindProduct(int productId)
-        {
-            return await QueryProducts().Where(x => x.Id == productId).FirstAsync();
-        }
-
-        public async Task<Category> FindCategory(int categoryId)
-        {
-            return await QueryCategories().Where(x => x.Id == categoryId).FirstAsync();
-        }
 
         public async Task<Shipper> FindCarrier(int shipperId)
         {
@@ -76,16 +58,6 @@ namespace NorthWindAPI.Data.Repositories
         private IQueryable<OrderDetail> QueryOrderDetails()
         {
             return _context.OrderDetail.AsQueryable();
-        }
-
-        private IQueryable<Product> QueryProducts()
-        {
-            return _context.Product.AsQueryable();
-        }
-
-        private IQueryable<Category> QueryCategories()
-        {
-            return _context.Category.AsQueryable();
         }
 
         private IQueryable<Shipper> QueryShippers()

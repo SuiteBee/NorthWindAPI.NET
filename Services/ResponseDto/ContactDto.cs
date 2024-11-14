@@ -9,6 +9,7 @@ namespace NorthWindAPI.Services.ResponseDto
         public string CourtestyTitle { get; set; }
         public required string Phone { get; set; }
         public string Fax { get; set; }
+        public string Website { get; set; }
 
         [SetsRequiredMembers]
         public ContactDto()
@@ -18,6 +19,7 @@ namespace NorthWindAPI.Services.ResponseDto
             CourtestyTitle = "";
             Phone = "";
             Fax = "";
+            Website = "";
         }
     }
 }

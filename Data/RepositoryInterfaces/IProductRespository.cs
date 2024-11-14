@@ -1,0 +1,13 @@
+﻿using NorthWindAPI.Data.Resources;
+
+namespace NorthWindAPI.Data.RepositoryInterfaces
+{
+    public interface IProductRepository
+    {
+        public Task<IEnumerable<Product>> AllProducts();
+        public Task<IEnumerable<Category>> AllCategories();
+        public Task<Product> FindProduct(int productId);
+        public Task<Category> FindCategory(int categoryId);
+        public Task<Supplier> FindSupplier(int supplierId);
+    }
+}
