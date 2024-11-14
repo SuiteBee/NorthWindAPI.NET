@@ -10,8 +10,6 @@ namespace NorthWindAPI.Services
     public class OrderService : IOrderService
     {
         private readonly IOrderRepository _orderRepository;
-        private readonly IEmployeeRepository _employeeRepository;
-        private readonly ICustomerRepository _customerRepository;
         private readonly IProductRepository _productRepository;
 
         private readonly IMapper _mapper;
@@ -21,14 +19,10 @@ namespace NorthWindAPI.Services
 
         public OrderService(
             IOrderRepository orderRepository, 
-            IEmployeeRepository employeeRepository, 
-            ICustomerRepository customerRepository,
             IProductRepository productRepository,
             IMapper mapper, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
-            _employeeRepository = employeeRepository;
-            _customerRepository = customerRepository;
             _productRepository = productRepository;
 
             _mapper = mapper;
@@ -41,9 +35,7 @@ namespace NorthWindAPI.Services
             var detailList = await _orderRepository.AllDetails();
             var productList = await _productRepository.AllProducts();
             var categoryList = await _productRepository.AllCategories();
-            var employeeList = await _employeeRepository.AllEmployees();
             var carrierList = await _orderRepository.AllCarriers();
-            var customerList = await _customerRepository.AllCustomers();
 
             var orderDto = _mapper.Map<IEnumerable<OrderDto>>(orderList);
 
@@ -59,24 +51,17 @@ namespace NorthWindAPI.Services
                     Product prod = productList.First(x => x.Id == detail.ProductId);
                     Category cat = categoryList.First(x => x.Id == prod.CategoryId);
 
-                    OrderItemDto prodDto = _mapper.Map<OrderItemDto>(prod);
-                    _mapper.Map(cat, prodDto);
-                    _mapper.Map(detail, prodDto);
+                    OrderItemDto itemDto = _mapper.Map<OrderItemDto>(prod);
+                    _mapper.Map(cat, itemDto);
+                    _mapper.Map(detail, itemDto);
 
-                    CalculateProductTotals(prodDto);
+                    CalculateItemTotals(itemDto);
 
-                    dto.Products.Add(prodDto);
+                    dto.Items.Add(itemDto);
                 }
-
-                var completedBy = employeeList.First(x => x.Id == order.EmployeeId);
-                _mapper.Map(completedBy, dto.CompletedBy);
 
                 var shippedBy = carrierList.First(x => x.Id == order.ShipVia);
                 _mapper.Map(shippedBy, dto.SendTo);
-
-                var orderedBy = customerList.First(x => x.Id == order.CustomerId);
-                _mapper.Map(orderedBy, dto.OrderedBy);
-                _mapper.Map(orderedBy, dto.OrderedBy.ContactInfo);
 
                 CalculateOrderTotal(dto);
             }
@@ -98,24 +83,17 @@ namespace NorthWindAPI.Services
                 Product prod = await _productRepository.FindProduct(detail.ProductId);
                 Category cat = await _productRepository.FindCategory(prod.CategoryId);
 
-                OrderItemDto prodDto = _mapper.Map<OrderItemDto>(prod);
-                _mapper.Map(cat, prodDto);
-                _mapper.Map(detail, prodDto);
+                OrderItemDto itemDto = _mapper.Map<OrderItemDto>(prod);
+                _mapper.Map(cat, itemDto);
+                _mapper.Map(detail, itemDto);
 
-                CalculateProductTotals(prodDto);
+                CalculateItemTotals(itemDto);
 
-                orderDto.Products.Add(prodDto);
+                orderDto.Items.Add(itemDto);
             };
-
-            var completedBy = await _employeeRepository.FindEmployee(orderBase.EmployeeId);
-            _mapper.Map(completedBy, orderDto.CompletedBy);
 
             var shippedBy = await _orderRepository.FindCarrier(orderBase.ShipVia);
             _mapper.Map(shippedBy, orderDto.SendTo);
-
-            var orderedBy = await _customerRepository.FindCustomer(orderBase.CustomerId);
-            _mapper.Map(orderedBy, orderDto.OrderedBy);
-            _mapper.Map(orderedBy, orderDto.OrderedBy.ContactInfo);
 
             CalculateOrderTotal(orderDto);
 
@@ -185,19 +163,25 @@ namespace NorthWindAPI.Services
 
         private void CalculateOrderTotal(OrderDto dto)
         {
-            var prodTotal = dto.Products.Sum(x => x.FinalPrice);
-            dto.OrderTotal = prodTotal + dto.SendTo.ShipCost;
+            dto.OrderSubtotal = dto.Items.Sum(x => x.FinalPrice);
+            dto.OrderTotal = dto.OrderSubtotal + dto.SendTo.ShipCost;
         }
 
-        private void CalculateProductTotals(OrderItemDto dto)
+        private void CalculateItemTotals(OrderItemDto dto)
         {
             dto.TotalPrice = GetTotalPrice(dto);
+            dto.DiscountAmt = GetDiscount(dto);
             dto.FinalPrice = GetFinalPrice(dto);
         }
 
         private decimal GetTotalPrice(OrderItemDto dto)
         {
             return Math.Round(dto.PurchasePrice * dto.Quantity, 2);
+        }
+
+        private decimal GetDiscount(OrderItemDto dto)
+        {
+            return dto.TotalPrice * (decimal)dto.Discount;
         }
 
         private decimal GetFinalPrice(OrderItemDto dto)

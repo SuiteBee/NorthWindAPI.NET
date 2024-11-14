@@ -12,9 +12,9 @@ namespace NorthWindAPI.Services
         private readonly ICustomerRepository _customerRepository;
 
         private readonly IMapper _mapper;
-        private readonly ILogger<OrderService> _logger;
+        private readonly ILogger<CustomerService> _logger;
 
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<OrderService> logger)
+        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger)
         {
             _customerRepository = customerRepository;
 

@@ -19,27 +19,43 @@ namespace NorthWindAPI.Services
             _mapper = mapper;
             _logger = logger;
         }
+        public async Task<IEnumerable<ProductDto>> ListProducts()
+        {
+            var productList = await _productRepository.AllProducts();
+            var categoryList = await _productRepository.AllCategories();
+            var supplierList = await _productRepository.AllSuppliers();
+
+            var productDto = _mapper.Map<IEnumerable<ProductDto>>(productList);
+
+            foreach (ProductDto dto in productDto)
+            {
+                Product prod = productList.First(x => x.Id == dto.ProductId);
+                Category cat = categoryList.First(x => x.Id == prod.CategoryId);
+                Supplier sup = supplierList.First(x => x.Id == prod.SupplierId);
+
+                _mapper.Map(cat, dto);
+                _mapper.Map(sup, dto.SuppliedBy);
+                _mapper.Map(sup, dto.SuppliedBy.Address);
+                _mapper.Map(sup, dto.SuppliedBy.ContactInfo);
+            }
+
+            return productDto;
+        }
 
         public async Task<ProductDto> FindProduct(int id)
         {
             Product product = await _productRepository.FindProduct(id);
             Category cat = await _productRepository.FindCategory(product.CategoryId);
+            Supplier supplier = await _productRepository.FindSupplier(product.SupplierId);
 
             ProductDto prodDto = _mapper.Map<ProductDto>(product);
             _mapper.Map(cat, prodDto);
 
-            Supplier suppliedBy = await _productRepository.FindSupplier(product.SupplierId);
-            _mapper.Map(suppliedBy, prodDto.Supplier);
-            _mapper.Map(suppliedBy, prodDto.Supplier.Address);
-            _mapper.Map(suppliedBy, prodDto.Supplier.ContactInfo);
+            _mapper.Map(supplier, prodDto.SuppliedBy);
+            _mapper.Map(supplier, prodDto.SuppliedBy.Address);
+            _mapper.Map(supplier, prodDto.SuppliedBy.ContactInfo);
 
             return prodDto;
-        }
-
-        public async Task<IEnumerable<ProductDto>> ListProducts()
-        {
-            var products = await _productRepository.AllProducts();
-            return _mapper.Map<IEnumerable<ProductDto>>(products);
         }
     }
 }

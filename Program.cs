@@ -37,6 +37,7 @@ builder.Services.AddCors();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 
 // Auto Mapper Config
@@ -46,6 +47,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new OrderRequestMap());
     cfg.AddProfile(new CustomerRequestMap());
     cfg.AddProfile(new ProductDtoMap());
+    cfg.AddProfile(new OrderResponseMap());
 
     cfg.AddCollectionMappers();
     cfg.UseEntityFrameworkCoreModel<AppDbContext>();

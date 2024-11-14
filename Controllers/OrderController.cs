@@ -2,8 +2,8 @@
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
-using NorthWindAPI.Services;
-using System.Runtime.InteropServices;
+using NorthWindAPI.Controllers.Models.Responses;
+using AutoMapper;
 
 namespace NorthWindAPI.Controllers
 {
@@ -12,35 +12,68 @@ namespace NorthWindAPI.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ICustomerService _customerService;
+        private readonly IEmployeeService _employeeService;
+
+        private readonly IMapper _mapper;
         private readonly ILogger<OrderController> _logger;
 
-        public OrderController(IOrderService orderService, ILogger<OrderController> logger)
+        public OrderController(
+            IOrderService orderService, 
+            ICustomerService customerService,
+            IEmployeeService employeeService,
+            IMapper mapper, 
+            ILogger<OrderController> logger)
         {
             _orderService = orderService;
+            _customerService = customerService;
+            _employeeService = employeeService;
+
+            _mapper = mapper;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> All()
+        public async Task<ActionResult<IEnumerable<OrderResponse>>> All()
         {
             var orders = await _orderService.ListOrders();
-            if (orders == null || !orders.Any())
+            var customers = await _customerService.ListCustomers();
+            var employees = await _employeeService.ListEmployees();
+
+            var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
+
+            foreach(OrderResponse order in orderResponse)
+            {
+                var customerId = order.OrderedBy.Id;
+                order.OrderedBy = customers.First(x => x.Id == customerId);
+
+                var employeeId = order.CompletedBy.Id;
+                order.CompletedBy = employees.First(x => x.Id == employeeId);
+            }
+
+            if (orderResponse == null || !orderResponse.Any())
             {
                 return NotFound();
             }
 
-            return orders.ToList();
+            return orderResponse;
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDto>> Find(int id)
+        public async Task<ActionResult<OrderResponse>> Find(int id)
         {
             var order = await _orderService.FindOrder(id);
-            if(order == null)
+
+            var orderResponse = _mapper.Map<OrderResponse>(order);
+
+            orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
+            orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+
+            if(orderResponse == null)
             {
                 return NotFound(id);
             }
-            return order;
+            return orderResponse;
         }
 
         [HttpPost]

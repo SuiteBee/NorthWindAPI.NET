@@ -10,6 +10,7 @@ namespace NorthWindAPI.Services.ResponseDto
         public int Quantity { get; set; }
         public decimal TotalPrice { get; set; }
         public double Discount { get; set; }
+        public decimal DiscountAmt { get; set; }
         public decimal FinalPrice { get; set; }
 
         [SetsRequiredMembers]
@@ -21,6 +22,7 @@ namespace NorthWindAPI.Services.ResponseDto
             Quantity = 0;
             TotalPrice = 0M;
             Discount = .00;
+            DiscountAmt = 0M;
             FinalPrice = 0M;
         }
 

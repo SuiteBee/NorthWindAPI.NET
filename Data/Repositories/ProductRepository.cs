@@ -28,6 +28,11 @@ namespace NorthWindAPI.Data.Repositories
             return await _context.Category.ToListAsync();
         }
 
+        public async Task<IEnumerable<Supplier>> AllSuppliers()
+        {
+            return await _context.Supplier.ToListAsync();
+        }
+
         #endregion
 
         #region " GET "
