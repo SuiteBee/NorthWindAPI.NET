@@ -13,7 +13,7 @@ namespace NorthWindAPI.Controllers
     {
         private readonly IOrderService _orderService;
         private readonly ICustomerService _customerService;
-        private readonly IEmployeeService _employeeService;
+        private readonly IUserService _employeeService;
 
         private readonly IMapper _mapper;
         private readonly ILogger<OrderController> _logger;
@@ -21,7 +21,7 @@ namespace NorthWindAPI.Controllers
         public OrderController(
             IOrderService orderService, 
             ICustomerService customerService,
-            IEmployeeService employeeService,
+            IUserService employeeService,
             IMapper mapper, 
             ILogger<OrderController> logger)
         {

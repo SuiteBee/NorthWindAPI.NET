@@ -37,6 +37,8 @@ namespace NorthWindAPI.Services
                 _mapper.Map(sup, dto.SuppliedBy);
                 _mapper.Map(sup, dto.SuppliedBy.Address);
                 _mapper.Map(sup, dto.SuppliedBy.ContactInfo);
+
+                dto.InStock = dto.StockAmt > 0;
             }
 
             return productDto;
@@ -50,10 +52,11 @@ namespace NorthWindAPI.Services
 
             ProductDto prodDto = _mapper.Map<ProductDto>(product);
             _mapper.Map(cat, prodDto);
-
             _mapper.Map(supplier, prodDto.SuppliedBy);
             _mapper.Map(supplier, prodDto.SuppliedBy.Address);
             _mapper.Map(supplier, prodDto.SuppliedBy.ContactInfo);
+
+            prodDto.InStock = prodDto.StockAmt > 0;
 
             return prodDto;
         }

@@ -11,7 +11,9 @@ namespace NorthWindAPI.Services.Mappers
         {
             CreateMap<Product, ProductDto>()
                 .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Id))
-                .ForMember(d => d.ItemPrice, o => o.MapFrom(s => s.UnitPrice));
+                .ForMember(d => d.ItemPrice, o => o.MapFrom(s => s.UnitPrice))
+                .ForMember(d => d.StockAmt, o => o.MapFrom(s => s.UnitsInStock));
+
             CreateMap<Category, ProductDto>()
                 .ForMember(d => d.CategoryDescription, o => o.MapFrom(s => s.Description));
 

@@ -5,14 +5,14 @@ using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services
 {
-    public class EmployeeService : IEmployeeService
+    public class UserService : IUserService
     {
         private readonly IEmployeeRepository _employeeRepository;
 
         private readonly IMapper _mapper;
-        private readonly ILogger<EmployeeService> _logger;
+        private readonly ILogger<UserService> _logger;
 
-        public EmployeeService(IEmployeeRepository employeeRepository, IMapper mapper, ILogger<EmployeeService> logger)
+        public UserService(IEmployeeRepository employeeRepository, IMapper mapper, ILogger<UserService> logger)
         {
             _employeeRepository = employeeRepository;
 

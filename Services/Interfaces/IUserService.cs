@@ -2,7 +2,7 @@
 
 namespace NorthWindAPI.Services.Interfaces
 {
-    public interface IEmployeeService
+    public interface IUserService
     {
         public Task<EmployeeDto> FindEmployee(int id);
         public Task<IEnumerable<EmployeeDto>> ListEmployees();
