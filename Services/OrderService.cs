@@ -29,6 +29,8 @@ namespace NorthWindAPI.Services
             _logger = logger;
         }
 
+        #region " SELECT "
+
         public async Task<IEnumerable<OrderDto>> ListOrders()
         {
             var orderList = await _orderRepository.AllOrders();
@@ -101,6 +103,10 @@ namespace NorthWindAPI.Services
 
         }
 
+        #endregion
+
+        #region " INSERT "
+
         public async Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder)
         {
             var toInsert = _mapper.Map<Order>(newOrder);
@@ -128,6 +134,10 @@ namespace NorthWindAPI.Services
             return await FindOrder(inserted.Id);
         }
 
+        #endregion
+
+        #region " UPDATE "
+
         public async Task<OrderDto> MarkAsShipped(int orderId, string? shippedDate = null)
         {
             var orderBase = await _orderRepository.FindOrder(orderId);
@@ -154,10 +164,16 @@ namespace NorthWindAPI.Services
             return toReturn;
         }
 
+        #endregion
+
+        #region " DELETE "
+
         public async Task<bool> RemoveOrder(int orderId)
         {
             return await _orderRepository.DeleteOrder(orderId);
         }
+
+        #endregion
 
         #region " Business Logic "
 
@@ -195,6 +211,98 @@ namespace NorthWindAPI.Services
             {
                 return dto.TotalPrice;
             }
+        }
+
+        #endregion
+
+        #region " Data Sets "
+
+        public async Task<IEnumerable<TotalsDto>> RevenueTotals()
+        {
+            var orderList = await ListOrders();
+
+            var totalsByYear = new List<TotalsDto>();
+            var ordersByYear = orderList.GroupBy(o => o.OrderDate.Substring(0, 4));
+
+            foreach(var orderYear in ordersByYear)
+            {
+                var currentTotalDto = CalculateYearTotals(orderYear);
+                CalculateQuarterTotals(currentTotalDto, orderYear);
+
+                totalsByYear.Add(currentTotalDto);
+            }
+
+            return totalsByYear;
+        }
+
+        private TotalsDto CalculateYearTotals(IGrouping<string, OrderDto> orders)
+        {
+            var currentYear = orders.Key;
+            var currentYearTotal = orders.Sum(o => o.OrderTotal);
+
+            var currentTotalDto = new TotalsDto { Year = currentYear, Total = currentYearTotal };
+            return currentTotalDto;
+        }
+
+        private void CalculateQuarterTotals(TotalsDto currentTotalDto, IGrouping<string, OrderDto> orders)
+        {
+            var ordersByQuarter = orders.GroupBy(o => (int.Parse(o.OrderDate.Substring(5, 2)) - 1) / 3);
+
+            currentTotalDto.QuarterOne = 0;
+            currentTotalDto.QuarterTwo = 0;
+            currentTotalDto.QuarterThree = 0;
+            currentTotalDto.QuarterFour = 0;
+
+            foreach (var orderQuarter in ordersByQuarter)
+            {
+                var currentQuarterTotal = Math.Round(orderQuarter.Sum(q => q.OrderTotal));
+
+                switch (orderQuarter.Key + 1)
+                {
+                    case 1:
+                        currentTotalDto.QuarterOne = currentQuarterTotal;
+                        break;
+                    case 2:
+                        currentTotalDto.QuarterTwo = currentQuarterTotal;
+                        break;
+                    case 3:
+                        currentTotalDto.QuarterThree = currentQuarterTotal;
+                        break;
+                    case 4:
+                        currentTotalDto.QuarterFour = currentQuarterTotal;
+                        break;
+                }
+            }
+        }
+
+        public async Task<IEnumerable<CategoryTotalsDto>> CategoryTotals()
+        {
+            var orderList = await ListOrders();
+            var itemList = new List<OrderItemDto>();
+            
+            foreach(OrderDto order in orderList)
+            {
+                itemList.AddRange(order.Items);
+            }
+
+            var allTotal = itemList.Sum(i => i.FinalPrice);
+            var totalsByCategory = new List<CategoryTotalsDto>();
+            var ordersByCategory = itemList.GroupBy(i => i.CategoryName);
+
+            foreach(var orderCat in ordersByCategory)
+            {
+                var currentCategory = CalculateCategoryTotal(allTotal, orderCat);
+                totalsByCategory.Add(currentCategory);
+            }
+
+            return totalsByCategory;
+        }
+
+        private CategoryTotalsDto CalculateCategoryTotal(decimal allTotal, IGrouping<string, OrderItemDto> items)
+        {
+            var catTotal = items.Sum(c => c.FinalPrice);
+            var catPercentage = Math.Round(decimal.Divide(catTotal, allTotal) * 100);
+            return new CategoryTotalsDto() { Category = items.Key, Percentage = catPercentage };
         }
 
         #endregion
