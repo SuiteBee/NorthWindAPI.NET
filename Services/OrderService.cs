@@ -255,7 +255,7 @@ namespace NorthWindAPI.Services
 
             foreach (var orderQuarter in ordersByQuarter)
             {
-                var currentQuarterTotal = Math.Round(orderQuarter.Sum(q => q.OrderTotal));
+                var currentQuarterTotal = orderQuarter.Sum(q => q.OrderTotal);
 
                 switch (orderQuarter.Key + 1)
                 {
