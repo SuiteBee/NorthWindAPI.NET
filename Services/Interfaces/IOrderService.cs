@@ -1,5 +1,4 @@
 ﻿using NorthWindAPI.Controllers.Models.Requests;
-using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services.Interfaces
@@ -13,8 +12,10 @@ namespace NorthWindAPI.Services.Interfaces
         public Task<IEnumerable<OrderDto>> MarkAsShipped(ShipRequest orders);
         public Task<bool> RemoveOrder(int orderId);
 
-        public Task<IEnumerable<TotalsDto>> RevenueTotals();
-        public Task<IEnumerable<CategoryTotalsDto>> CategoryTotals();
+        public Task<IEnumerable<RevenueDto>> RevenueTotals();
+        public Task<IEnumerable<CategoryRatiosDto>> CategoryRatios();
+        public Task<IEnumerable<CategoryRevenueDto>> CategoryRevenue();
+        public Task<int> PendingShipments();
     }
 }
 

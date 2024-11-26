@@ -35,7 +35,9 @@ namespace NorthWindAPI.Controllers
             var response = new TotalResponse();
 
             response.Revenue = await _orderService.RevenueTotals();
-            response.Categories = await _orderService.CategoryTotals();
+            response.Categories = await _orderService.CategoryRatios();
+            response.CategoryRevenue = await _orderService.CategoryRevenue();
+            response.PendingShipments = await _orderService.PendingShipments();
 
             return response;
         }

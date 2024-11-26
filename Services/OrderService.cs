@@ -4,6 +4,7 @@ using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace NorthWindAPI.Services
 {
@@ -217,11 +218,13 @@ namespace NorthWindAPI.Services
 
         #region " Data Sets "
 
-        public async Task<IEnumerable<TotalsDto>> RevenueTotals()
+        #region " Revenue Total "
+
+        public async Task<IEnumerable<RevenueDto>> RevenueTotals()
         {
             var orderList = await ListOrders();
 
-            var totalsByYear = new List<TotalsDto>();
+            var totalsByYear = new List<RevenueDto>();
             var ordersByYear = orderList.GroupBy(o => o.OrderDate.Substring(0, 4));
 
             foreach(var orderYear in ordersByYear)
@@ -235,18 +238,18 @@ namespace NorthWindAPI.Services
             return totalsByYear;
         }
 
-        private TotalsDto CalculateYearTotals(IGrouping<string, OrderDto> orders)
+        private RevenueDto CalculateYearTotals(IGrouping<string, OrderDto> orderYear)
         {
-            var currentYear = orders.Key;
-            var currentYearTotal = orders.Sum(o => o.OrderTotal);
+            var currentYear = orderYear.Key;
+            var currentYearTotal = orderYear.Sum(o => o.OrderTotal);
 
-            var currentTotalDto = new TotalsDto { Year = currentYear, Total = currentYearTotal };
+            var currentTotalDto = new RevenueDto { Year = currentYear, Total = currentYearTotal };
             return currentTotalDto;
         }
 
-        private void CalculateQuarterTotals(TotalsDto currentTotalDto, IGrouping<string, OrderDto> orders)
+        private void CalculateQuarterTotals(RevenueDto currentTotalDto, IGrouping<string, OrderDto> orderYear)
         {
-            var ordersByQuarter = orders.GroupBy(o => (int.Parse(o.OrderDate.Substring(5, 2)) - 1) / 3);
+            var ordersByQuarter = orderYear.GroupBy(o => (int.Parse(o.OrderDate.Substring(5, 2)) - 1) / 3);
 
             currentTotalDto.QuarterOne = 0;
             currentTotalDto.QuarterTwo = 0;
@@ -275,7 +278,11 @@ namespace NorthWindAPI.Services
             }
         }
 
-        public async Task<IEnumerable<CategoryTotalsDto>> CategoryTotals()
+        #endregion
+
+        #region " Category Ratios "
+
+        public async Task<IEnumerable<CategoryRatiosDto>> CategoryRatios()
         {
             var orderList = await ListOrders();
             var itemList = new List<OrderItemDto>();
@@ -286,7 +293,7 @@ namespace NorthWindAPI.Services
             }
 
             var allTotal = itemList.Sum(i => i.FinalPrice);
-            var totalsByCategory = new List<CategoryTotalsDto>();
+            var totalsByCategory = new List<CategoryRatiosDto>();
             var ordersByCategory = itemList.GroupBy(i => i.CategoryName);
 
             foreach(var orderCat in ordersByCategory)
@@ -298,12 +305,128 @@ namespace NorthWindAPI.Services
             return totalsByCategory;
         }
 
-        private CategoryTotalsDto CalculateCategoryTotal(decimal allTotal, IGrouping<string, OrderItemDto> items)
+        private CategoryRatiosDto CalculateCategoryTotal(decimal allTotal, IGrouping<string, OrderItemDto> items)
         {
             var catTotal = items.Sum(c => c.FinalPrice);
             var catPercentage = Math.Round(decimal.Divide(catTotal, allTotal) * 100);
-            return new CategoryTotalsDto() { Category = items.Key, Percentage = catPercentage };
+            return new CategoryRatiosDto() { Category = items.Key, Percentage = catPercentage };
         }
+
+        #endregion
+
+        #region " Category Revenue " 
+
+        public async Task<IEnumerable<CategoryRevenueDto>> CategoryRevenue()
+        {
+            var orderList = await ListOrders();
+
+            var categoriesByYear = new List<CategoryRevenueDto>();
+            var ordersByYear = orderList.GroupBy(o => int.Parse(o.OrderDate.Substring(0, 4)));
+            var minYear = ordersByYear.Min(o => o.Key);
+            var maxYear = ordersByYear.Max(o => o.Key);
+
+            //Calculate category totals per year for existing order years
+            foreach (var orderYear in ordersByYear)
+            {
+                var categoryYear = CalculateCategoryYear(orderYear);
+                categoriesByYear.Add(categoryYear);
+            }
+
+            //Loop all years and fill-in data for missing years
+            for(int i=minYear; i<=maxYear; i++)
+            {
+                if(i > minYear)
+                {
+                    var currentYear = categoriesByYear.FirstOrDefault(c => c.Year == i);
+                    var previousYear = categoriesByYear.First(c => c.Year == i - 1);
+
+                    //Fill in empty years with previous year total
+                    if(currentYear == null)
+                    {
+                        var emptyYear = new CategoryRevenueDto()
+                        {
+                            Year = i,
+                            Beverages = previousYear.Beverages,
+                            Condiments = previousYear.Condiments,
+                            Confections = previousYear.Confections,
+                            Dairy = previousYear.Dairy,
+                            Grains = previousYear.Grains,
+                            Meat = previousYear.Meat,
+                            Produce = previousYear.Produce,
+                            Seafood = previousYear.Seafood
+                        };
+                        categoriesByYear.Add(emptyYear);
+                    }
+                    //Return category totals as additive - current year is sum of all previous
+                    else
+                    {
+                        currentYear.Beverages += previousYear.Beverages;
+                        currentYear.Condiments += previousYear.Condiments;
+                        currentYear.Confections += previousYear.Confections;
+                        currentYear.Dairy += previousYear.Dairy;
+                        currentYear.Grains += previousYear.Grains;
+                        currentYear.Meat += previousYear.Meat;
+                        currentYear.Produce += previousYear.Produce;
+                        currentYear.Seafood += previousYear.Seafood;
+                    }
+                }
+            }
+
+            return categoriesByYear;
+        }
+
+        private CategoryRevenueDto CalculateCategoryYear(IGrouping<int, OrderDto> orderYear)
+        {
+            var categoriesByYear = orderYear.SelectMany(o => o.Items).GroupBy(i => i.CategoryName);
+            var currentYearCategoryTotal = new CategoryRevenueDto() { Year = orderYear.Key };
+
+            foreach (var categoryYear in categoriesByYear)
+            {
+                var currentTotal = categoryYear.Sum(i => i.FinalPrice);
+
+                switch (categoryYear.Key)
+                {
+                    case "Beverages":
+                        currentYearCategoryTotal.Beverages = currentTotal;
+                        break;
+                    case "Condiments":
+                        currentYearCategoryTotal.Condiments = currentTotal;
+                        break;
+                    case "Confections":
+                        currentYearCategoryTotal.Confections = currentTotal;
+                        break;
+                    case "Dairy Products":
+                        currentYearCategoryTotal.Dairy = currentTotal;
+                        break;
+                    case "Grains/Cereals":
+                        currentYearCategoryTotal.Grains = currentTotal;
+                        break;
+                    case "Meat/Poultry":
+                        currentYearCategoryTotal.Meat = currentTotal;
+                        break;
+                    case "Produce":
+                        currentYearCategoryTotal.Produce = currentTotal;
+                        break;
+                    case "Seafood":
+                        currentYearCategoryTotal.Seafood = currentTotal;
+                        break;
+                }
+            }
+
+            return currentYearCategoryTotal;
+        }
+
+        #endregion
+
+        #region " Pending Shipments "
+
+        public async Task<int> PendingShipments()
+        {
+            var orderList = await ListOrders();
+            return orderList.Count(o => o.SendTo.ShippedDate == null);
+        }
+
+        #endregion
 
         #endregion
     }

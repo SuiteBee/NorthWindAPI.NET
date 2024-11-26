@@ -1,6 +1,6 @@
 ﻿namespace NorthWindAPI.Services.ResponseDto
 {
-    public class TotalsDto
+    public class RevenueDto
     {
         public string? Year { get; set; }
         public decimal Total { get; set; }
