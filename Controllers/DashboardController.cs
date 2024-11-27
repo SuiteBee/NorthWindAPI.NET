@@ -38,6 +38,7 @@ namespace NorthWindAPI.Controllers
             response.Categories = await _orderService.CategoryRatios();
             response.CategoryRevenue = await _orderService.CategoryRevenue();
             response.PendingShipments = await _orderService.PendingShipments();
+            response.CategoryHeatmap = await _orderService.CategoryHeatmap();
 
             return response;
         }

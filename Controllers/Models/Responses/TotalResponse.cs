@@ -8,6 +8,7 @@ namespace NorthWindAPI.Controllers.Models.Responses
         public IEnumerable<CategoryRatiosDto> Categories { get; set; } = new List<CategoryRatiosDto>();
         public IEnumerable<CategoryRevenueDto> CategoryRevenue { get; set; } = new List<CategoryRevenueDto>();
         public int PendingShipments { get; set; }
+        public IEnumerable<CategoryHeatmapDto> CategoryHeatmap { get; set; } = new List<CategoryHeatmapDto>();
 
     }
 }

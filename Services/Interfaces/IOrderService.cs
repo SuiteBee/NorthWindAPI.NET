@@ -16,6 +16,7 @@ namespace NorthWindAPI.Services.Interfaces
         public Task<IEnumerable<CategoryRatiosDto>> CategoryRatios();
         public Task<IEnumerable<CategoryRevenueDto>> CategoryRevenue();
         public Task<int> PendingShipments();
+        public Task<IEnumerable<CategoryHeatmapDto>> CategoryHeatmap();
     }
 }
 

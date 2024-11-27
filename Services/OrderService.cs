@@ -4,7 +4,6 @@ using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.ResponseDto;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace NorthWindAPI.Services
 {
@@ -372,7 +371,7 @@ namespace NorthWindAPI.Services
                 }
             }
 
-            return categoriesByYear;
+            return categoriesByYear.OrderBy(x => x.Year);
         }
 
         private CategoryRevenueDto CalculateCategoryYear(IGrouping<int, OrderDto> orderYear)
@@ -424,6 +423,67 @@ namespace NorthWindAPI.Services
         {
             var orderList = await ListOrders();
             return orderList.Count(o => o.SendTo.ShippedDate == null);
+        }
+
+        #endregion
+
+        #region " Category Heatmap "
+
+        public async Task<IEnumerable<CategoryHeatmapDto>> CategoryHeatmap()
+        {
+            var orderList = await ListOrders();
+
+            var categoriesByMonth = new List<CategoryHeatmapDto>();
+            var ordersByMonth = orderList.GroupBy(o => int.Parse(o.OrderDate.Substring(5, 2)));
+
+            foreach(var orderMonth in ordersByMonth)
+            {
+                var categoryMonth = CountCategoryItemsMonth(orderMonth);
+                categoriesByMonth.Add(categoryMonth);
+            }
+
+            return categoriesByMonth.OrderBy(x => x.Month);
+        }
+
+        private CategoryHeatmapDto CountCategoryItemsMonth(IGrouping<int, OrderDto> orderMonth)
+        {
+            var categoriesByMonth = orderMonth.SelectMany(o => o.Items).GroupBy(i => i.CategoryName);
+            var currentMonthCategoryItems = new CategoryHeatmapDto() { Month = orderMonth.Key };
+
+            foreach(var categoryMonth in categoriesByMonth)
+            {
+                var numOrders = categoryMonth.Count();
+
+                switch (categoryMonth.Key)
+                {
+                    case "Beverages":
+                        currentMonthCategoryItems.Beverages = numOrders;
+                        break;
+                    case "Condiments":
+                        currentMonthCategoryItems.Condiments = numOrders;
+                        break;
+                    case "Confections":
+                        currentMonthCategoryItems.Confections = numOrders;
+                        break;
+                    case "Dairy Products":
+                        currentMonthCategoryItems.Dairy = numOrders;
+                        break;
+                    case "Grains/Cereals":
+                        currentMonthCategoryItems.Grains = numOrders;
+                        break;
+                    case "Meat/Poultry":
+                        currentMonthCategoryItems.Meat = numOrders;
+                        break;
+                    case "Produce":
+                        currentMonthCategoryItems.Produce = numOrders;
+                        break;
+                    case "Seafood":
+                        currentMonthCategoryItems.Seafood = numOrders;
+                        break;
+                }
+            }
+
+            return currentMonthCategoryItems;
         }
 
         #endregion
