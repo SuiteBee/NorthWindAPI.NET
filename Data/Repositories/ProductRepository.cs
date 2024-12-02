@@ -68,5 +68,14 @@ namespace NorthWindAPI.Data.Repositories
         }
 
         #endregion
+
+        #region " PUT "
+
+        public async Task<Product> UpdateProduct(int id, Product prod)
+        {
+            return await _baseProductRepo.UpdateEntityAsync(id, prod);
+        }
+
+        #endregion
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NorthWindAPI.Services;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -39,6 +38,24 @@ namespace NorthWindAPI.Controllers
                 return NotFound();
             }
             return product;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductDto>> Price(int id, ProductDto prod)
+        {
+            return await _productService.PriceUpdate(id, prod);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductDto>> Stock(int id, ProductDto prod)
+        {
+            return await _productService.AddStock(id, prod);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductDto>> Update(int id, ProductDto prod)
+        {
+            return await _productService.Update(id, prod);
         }
     }
 }
