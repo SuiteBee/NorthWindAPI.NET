@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Responses;
-using NorthWindAPI.Services.Interfaces;
-using NorthWindAPI.Services.ResponseDto;
+using NorthWindAPI.Views.Interfaces;
 
 namespace NorthWindAPI.Controllers
 {
@@ -10,35 +9,33 @@ namespace NorthWindAPI.Controllers
     [Route("api/[controller]/[Action]")]
     public class DashboardController : ControllerBase
     {
-        private readonly IOrderService _orderService;
-        private readonly ICustomerService _customerService;
+        private readonly IDashboardView _dashboardView;
 
         private readonly IMapper _mapper;
         private readonly ILogger<DashboardController> _logger;
 
         public DashboardController(
-            IOrderService orderService,
-            ICustomerService customerService,
+            IDashboardView dashboardView,
             IMapper mapper,
             ILogger<DashboardController> logger)
         {
-            _orderService = orderService;
-            _customerService = customerService;
+            _dashboardView = dashboardView;
 
             _mapper = mapper;
             _logger = logger;
         }
 
         [HttpGet]
-        public async Task<ActionResult<TotalResponse>> Totals()
+        public async Task<ActionResult<ChartsResponse>> Charts()
         {
-            var response = new TotalResponse();
+            var response = new ChartsResponse();
 
-            response.Revenue = await _orderService.RevenueTotals();
-            response.Categories = await _orderService.CategoryRatios();
-            response.CategoryRevenue = await _orderService.CategoryRevenue();
-            response.PendingShipments = await _orderService.PendingShipments();
-            response.CategoryHeatmap = await _orderService.CategoryHeatmap();
+            response.Totals = await _dashboardView.GetTotals();
+            response.Revenue = await _dashboardView.RevenueTotals();
+            response.Categories = await _dashboardView.CategoryRatios();
+            response.CategoryRevenue = await _dashboardView.CategoryRevenue();
+            response.PendingShipments = await _dashboardView.PendingShipments();
+            response.CategoryHeatmap = await _dashboardView.CategoryHeatmap();
 
             return response;
         }

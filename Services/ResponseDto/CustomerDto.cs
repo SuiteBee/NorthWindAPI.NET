@@ -7,6 +7,7 @@ namespace NorthWindAPI.Services.ResponseDto
         public required string Id { get; set; }
         public required string CompanyName { get; set; }
         public required ContactDto ContactInfo { get; set; }
+        public required AddressDto Address { get; set; }
 
         [SetsRequiredMembers]
         public CustomerDto()
@@ -14,6 +15,7 @@ namespace NorthWindAPI.Services.ResponseDto
             Id = "";
             CompanyName = "";
             ContactInfo = new ContactDto();
+            Address = new AddressDto();
         }
     }
 }

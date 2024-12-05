@@ -34,8 +34,17 @@ namespace NorthWindAPI.Services.Mappers
 
             CreateMap<Employee, EmployeeDto>();
 
-            CreateMap<Customer, CustomerDto>();
+            CreateMap<Customer, CustomerDto>()
+                .ForMember(d => d.ContactInfo, o => o.Ignore())
+                .ForMember(d => d.Address, o => o.Ignore());
+
             CreateMap<Customer, ContactDto>();
+            CreateMap<Customer, AddressDto>()
+                .ForMember(d => d.Street, o => o.MapFrom(s => s.Address))
+                .ForMember(d => d.City, o => o.MapFrom(s => s.City))
+                .ForMember(d => d.PostalCode, o => o.MapFrom(s => s.PostalCode))
+                .ForMember(d => d.Country, o => o.MapFrom(s => s.Country))
+                .ForMember(d => d.Region, o => o.MapFrom(s => s.Region));
 
             CreateMap<OrderDetail, OrderDto>();
             CreateMap<Product, OrderDto>();

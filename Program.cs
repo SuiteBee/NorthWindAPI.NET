@@ -9,6 +9,8 @@ using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Repositories;
 using AutoMapper.EquivalencyExpression;
+using NorthWindAPI.Views.Interfaces;
+using NorthWindAPI.Views;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -39,6 +41,9 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IProductService, ProductService>();
+
+//Views
+builder.Services.AddScoped<IDashboardView, DashboardView>();
 
 // Auto Mapper Config
 var mapperConfig = new MapperConfiguration(cfg =>

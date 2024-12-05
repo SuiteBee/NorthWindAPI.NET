@@ -27,6 +27,7 @@ namespace NorthWindAPI.Services
             var customer = await _customerRepository.FindCustomer(id);
             var toReturn = _mapper.Map<CustomerDto>(customer);
             _mapper.Map(customer, toReturn.ContactInfo);
+            _mapper.Map(customer, toReturn.Address);
 
             return toReturn;
         }
@@ -40,6 +41,7 @@ namespace NorthWindAPI.Services
             {
                 var currentCust = customers.First(x => x.Id == dto.Id);
                 _mapper.Map(currentCust, dto.ContactInfo);
+                _mapper.Map(currentCust, dto.Address);
             }
 
             return toReturn;
