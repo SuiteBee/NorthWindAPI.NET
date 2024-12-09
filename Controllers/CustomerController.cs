@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
+using NorthWindAPI.Controllers.Models.Responses;
+using NorthWindAPI.Services;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -41,11 +43,25 @@ namespace NorthWindAPI.Controllers
             return customer;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<RegionsResponse>> Regions()
+        {
+            var customerRegions = await _customerService.CustomerRegions();
+            RegionsResponse response = new RegionsResponse() { Regions = customerRegions };
+            return response;
+        }
+
         [HttpPost]
         public async Task<ActionResult<CustomerDto>> Create(NewCustomerRequest newCustomer)
         {
             var customer = await _customerService.ProcessNewCustomer(newCustomer);
             return customer;
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<CustomerDto>> Update(string id, CustomerDto customer)
+        {
+            return await _customerService.Update(id, customer);
         }
     }
 }

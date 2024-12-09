@@ -47,6 +47,16 @@ namespace NorthWindAPI.Services
             return toReturn;
         }
 
+        public async Task<IEnumerable<RegionDto>> CustomerRegions()
+        {
+            var customers = await _customerRepository.AllCustomers();
+
+            var countryRegions = customers.Select(c => new RegionDto { Region = c.Region, Country = c.Country });
+            var uniqueCountryRegions = countryRegions.DistinctBy(r => new { r.Region, r.Country });
+
+            return uniqueCountryRegions.ToList();
+        }
+
         public async Task<CustomerDto> ProcessNewCustomer(NewCustomerRequest newCustomer)
         {
             var toInsert = _mapper.Map<Customer>(newCustomer);
@@ -56,6 +66,27 @@ namespace NorthWindAPI.Services
             var inserted = await _customerRepository.InsertCustomer(toInsert);
 
             return await FindCustomer(inserted.Id);
+        }
+
+        public async Task<CustomerDto> Update(string id, CustomerDto customer)
+        {
+            var cusBase = await _customerRepository.FindCustomer(id);
+
+            //Cannot be mapped due to tracking
+            cusBase.Address = customer.Address.Street;
+            cusBase.City = customer.Address.City;
+            cusBase.PostalCode = customer.Address.PostalCode;
+            cusBase.Country = customer.Address.Country;
+            cusBase.Region = customer.Address.Region;
+
+            cusBase.ContactName = customer.ContactInfo.ContactName;
+            cusBase.ContactTitle = customer.ContactInfo.ContactTitle;
+            cusBase.Phone = customer.ContactInfo.Phone;
+            cusBase.Fax = customer.ContactInfo.Fax;
+
+
+            await _customerRepository.UpdateCustomer(id, cusBase);
+            return await FindCustomer(id);
         }
     }
 }

@@ -31,5 +31,10 @@ namespace NorthWindAPI.Data.Repositories
             return await _baseCustomerRepo.AddEntityAsync(customer);
         }
 
+        public async Task<Customer> UpdateCustomer(string id, Customer customer)
+        {
+            return await _baseCustomerRepo.UpdateEntityAsync(id, customer);
+        }
+
     }
 }

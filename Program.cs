@@ -50,6 +50,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
 {
     cfg.AddProfile(new OrderDtoMap());
     cfg.AddProfile(new OrderRequestMap());
+    cfg.AddProfile(new CustomerDtoMap());
     cfg.AddProfile(new CustomerRequestMap());
     cfg.AddProfile(new ProductDtoMap());
     cfg.AddProfile(new OrderResponseMap());
