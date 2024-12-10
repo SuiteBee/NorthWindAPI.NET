@@ -10,7 +10,8 @@ namespace NorthWindAPI.Services.Mappers
         {
             CreateMap<OrderDto, OrderResponse>()
                .ForMember(d => d.OrderedBy, o => o.MapFrom(s => new CustomerDto { Id = s.CustomerId }))
-               .ForMember(d => d.CompletedBy, o => o.MapFrom(s => new EmployeeDto { Id = s.EmployeeId }));           
+               .ForMember(d => d.CompletedBy, o => o.MapFrom(s => new EmployeeDto { Id = s.EmployeeId }))
+               .ForMember(d => d.Fulfilled, o => o.MapFrom(s => !string.IsNullOrEmpty(s.SendTo.ShippedDate)));
         }
     }
 }
