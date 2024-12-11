@@ -76,6 +76,11 @@ namespace NorthWindAPI.Services
             var orderBase = await _orderRepository.FindOrder(orderId);
             var orderDetails = await _orderRepository.FindDetail(orderId);
 
+            if(orderBase == null)
+            {
+                throw new BadHttpRequestException("Resource does not exist");
+            }
+
             var orderDto = _mapper.Map<OrderDto>(orderBase);
             _mapper.Map(orderBase, orderDto.SendTo);
             _mapper.Map(orderBase, orderDto.SendTo.Address);

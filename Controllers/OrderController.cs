@@ -62,31 +62,47 @@ namespace NorthWindAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderResponse>> Find(int id)
         {
-            var order = await _orderService.FindOrder(id);
+            try
+            {
+                var order = await _orderService.FindOrder(id);
+
+                var orderResponse = _mapper.Map<OrderResponse>(order);
+
+                orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
+                orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+
+                return orderResponse;
+            }
+            catch(Exception ex)
+            {
+                return NotFound(id);
+            }
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<OrderResponse>> Create(NewOrderRequest newOrder)
+        {
+            var order = await _orderService.ProcessNewOrder(newOrder);
 
             var orderResponse = _mapper.Map<OrderResponse>(order);
 
             orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
             orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
 
-            if(orderResponse == null)
-            {
-                return NotFound(id);
-            }
             return orderResponse;
         }
 
-        [HttpPost]
-        public async Task<ActionResult<OrderDto>> Create(NewOrderRequest newOrder)
-        {
-            var order = await _orderService.ProcessNewOrder(newOrder);
-            return order;
-        }
-
         [HttpPut("{id}")]
-        public async Task<ActionResult<OrderDto>> Ship(int id, string? shipDate = null)
+        public async Task<ActionResult<OrderResponse>> Ship(int id, string? shipDate = null)
         {
-            return await _orderService.MarkAsShipped(id, shipDate);
+            var order = await _orderService.MarkAsShipped(id, shipDate);
+
+            var orderResponse = _mapper.Map<OrderResponse>(order);
+
+            orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
+            orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+
+            return orderResponse;
         }
 
         [HttpPut]
