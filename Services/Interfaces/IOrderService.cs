@@ -7,6 +7,7 @@ namespace NorthWindAPI.Services.Interfaces
     {
         public Task<IEnumerable<OrderDto>> ListOrders();
         public Task<OrderDto> FindOrder(int orderId);
+        public Task<IEnumerable<CarrierDto>> Carriers();
         public Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder);
         public Task<OrderDto> MarkAsShipped(int orderId, string? shippedDate = null);
         public Task<IEnumerable<OrderDto>> MarkAsShipped(ShipRequest orders);

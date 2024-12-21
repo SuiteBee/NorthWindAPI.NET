@@ -4,6 +4,7 @@ using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using AutoMapper;
+using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Controllers
 {
@@ -110,6 +111,14 @@ namespace NorthWindAPI.Controllers
         {
             var shippedOrders = await _orderService.MarkAsShipped(orders);
             return shippedOrders.ToList();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<ShipOptionResponse>> Carriers()
+        {
+            var carriers = await _orderService.Carriers();
+            ShipOptionResponse response = new ShipOptionResponse() { Carriers = carriers };
+            return response;
         }
 
         [HttpDelete("{id}")]

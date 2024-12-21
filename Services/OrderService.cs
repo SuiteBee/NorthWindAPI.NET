@@ -108,6 +108,13 @@ namespace NorthWindAPI.Services
 
         }
 
+        public async Task<IEnumerable<CarrierDto>> Carriers()
+        {
+            var carriers = await _orderRepository.AllCarriers();
+            var shipOptions = carriers.Select(c => new CarrierDto { Id = c.Id, CompanyName = c.CompanyName, Phone = c.Phone });
+            return shipOptions.ToList();
+        }
+
         #endregion
 
         #region " INSERT "
