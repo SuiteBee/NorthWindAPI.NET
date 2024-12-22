@@ -6,6 +6,7 @@ namespace NorthWindAPI.Services.ResponseDto
     {
         public required string ProductName { get; set; }
         public required string CategoryName { get; set; }
+        public decimal ItemPrice { get; set; }
         public decimal PurchasePrice { get; set; }
         public int Quantity { get; set; }
         public decimal TotalPrice { get; set; }

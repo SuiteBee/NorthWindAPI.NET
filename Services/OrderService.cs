@@ -138,7 +138,10 @@ namespace NorthWindAPI.Services
                 var toInsertDetail = _mapper.Map<OrderDetail>(detail);
                 toInsertDetail.Id = $"{inserted.Id}/{detail.ProductId}";
                 toInsertDetail.OrderId = inserted.Id;
-                toInsertDetail.UnitPrice = prod.UnitPrice;
+
+                var itemDiscount = detail.Discount / 100;
+                toInsertDetail.Discount = (double)itemDiscount;
+                toInsertDetail.UnitPrice = prod.UnitPrice - Math.Round(prod.UnitPrice * itemDiscount, 2);
 
                 await _orderRepository.InsertDetail(toInsertDetail);
             }
@@ -204,7 +207,7 @@ namespace NorthWindAPI.Services
 
         private decimal GetTotalPrice(OrderItemDto dto)
         {
-            return Math.Round(dto.PurchasePrice * dto.Quantity, 2);
+            return Math.Round(dto.ItemPrice * dto.Quantity, 2);
         }
 
         private decimal GetDiscount(OrderItemDto dto)
