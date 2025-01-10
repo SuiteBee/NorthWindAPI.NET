@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Infrastructure;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace NorthWindAPI.Services
 {
@@ -11,13 +15,15 @@ namespace NorthWindAPI.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
 
+        private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly ILogger<AuthService> _logger;
 
-        public AuthService(IEmployeeRepository employeeRepository, IMapper mapper, ILogger<AuthService> logger)
+        public AuthService(IEmployeeRepository employeeRepository, IConfiguration config, IMapper mapper, ILogger<AuthService> logger)
         {
             _employeeRepository = employeeRepository;
 
+            _config = config;
             _mapper = mapper;
             _logger = logger;
 
@@ -44,6 +50,20 @@ namespace NorthWindAPI.Services
             }
 
             return auth;
+        }
+
+        public string GenerateToken()
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+            var Sectoken = new JwtSecurityToken(_config["Jwt:Issuer"],
+              _config["Jwt:Issuer"],
+              null,
+              expires: DateTime.Now.AddMinutes(120),
+              signingCredentials: credentials);
+
+            return new JwtSecurityTokenHandler().WriteToken(Sectoken);
         }
 
         public async Task<bool> ChangePass(string usr, string previous, string pwd)

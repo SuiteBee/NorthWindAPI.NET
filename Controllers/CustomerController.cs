@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using NorthWindAPI.Services.Interfaces;
@@ -19,6 +20,7 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CustomerDto>>> All()
         {
@@ -31,6 +33,7 @@ namespace NorthWindAPI.Controllers
             return customers.ToList();
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<CustomerDto>> Find(string id)
         {
@@ -42,6 +45,7 @@ namespace NorthWindAPI.Controllers
             return customer;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<RegionsResponse>> Regions()
         {
@@ -50,6 +54,7 @@ namespace NorthWindAPI.Controllers
             return response;
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<CustomerDto>> Create(NewCustomerRequest newCustomer)
         {
@@ -57,6 +62,7 @@ namespace NorthWindAPI.Controllers
             return customer;
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<CustomerDto>> Update(string id, CustomerDto customer)
         {

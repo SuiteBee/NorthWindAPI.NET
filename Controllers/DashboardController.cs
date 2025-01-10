@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Responses;
 using NorthWindAPI.Views.Interfaces;
@@ -25,6 +26,7 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ChartsResponse>> Charts()
         {

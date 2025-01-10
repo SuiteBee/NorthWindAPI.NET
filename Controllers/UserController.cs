@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using NorthWindAPI.Services.Interfaces;
-using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Controllers
 {
@@ -24,18 +24,20 @@ namespace NorthWindAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<UserResponse>> Authenticate(AuthRequest credentials)
         {
-            var user = new UserDto() { UserName = credentials.usr };
+            var response = new UserResponse();
             var auth = await _authService.Authenticate(credentials.usr, credentials.pwd);
 
             if (auth.Authorized)
             {
-                user = await _userService.FindUser(auth);
-                return Accepted(user);
+                response.Token = _authService.GenerateToken();
+                response.AuthorizedUser = await _userService.FindUser(auth);
+                return Accepted(response);
             }
 
-            return Unauthorized(user);
+            return Unauthorized(response);
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<ActionResult> Update(AuthUpdateRequest credentials)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -17,6 +18,7 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> All()
         {
@@ -29,6 +31,7 @@ namespace NorthWindAPI.Controllers
             return products.ToList();
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDto>> Find(int id)
         {
@@ -40,18 +43,21 @@ namespace NorthWindAPI.Controllers
             return product;
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDto>> Price(int id, ProductDto prod)
         {
             return await _productService.PriceUpdate(id, prod);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDto>> Stock(int id, ProductDto prod)
         {
             return await _productService.AddStock(id, prod);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDto>> Update(int id, ProductDto prod)
         {

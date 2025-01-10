@@ -1,6 +1,9 @@
-using AutoMapper;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+
 using NorthWindAPI.Services;
 using NorthWindAPI.Data.Context;
 
@@ -8,12 +11,35 @@ using NorthWindAPI.Services.Mappers;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Repositories;
-using AutoMapper.EquivalencyExpression;
 using NorthWindAPI.Views.Interfaces;
 using NorthWindAPI.Views;
 
+using AutoMapper;
+using AutoMapper.EquivalencyExpression;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
+
+/////////////////////////////////////////////////////////////
+// Token Auth Configuration
+/////////////////////////////////////////////////////////////
+var jwtIssuer = configuration.GetSection("Jwt:Issuer").Get<string>();
+var jwtKey = configuration.GetSection("Jwt:Key").Get<string>();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+    };
+});
 
 /////////////////////////////////////////////////////////////
 // Register Servies
@@ -77,6 +103,7 @@ app.UseHttpsRedirection();
 //Enable CORS to allow anything from dev host
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

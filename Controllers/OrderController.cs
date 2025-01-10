@@ -4,6 +4,7 @@ using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NorthWindAPI.Controllers
 {
@@ -33,6 +34,7 @@ namespace NorthWindAPI.Controllers
             _logger = logger;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderResponse>>> All()
         {
@@ -59,6 +61,7 @@ namespace NorthWindAPI.Controllers
             return orderResponse;
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderResponse>> Find(int id)
         {
@@ -79,6 +82,7 @@ namespace NorthWindAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<OrderResponse>> Create(NewOrderRequest newOrder)
         {
@@ -92,6 +96,7 @@ namespace NorthWindAPI.Controllers
             return orderResponse;
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<OrderResponse>> Ship(int id, string? shipDate = null)
         {
@@ -105,6 +110,7 @@ namespace NorthWindAPI.Controllers
             return orderResponse;
         }
 
+        [Authorize]
         [HttpPut]
         public async Task<ActionResult<IEnumerable<OrderDto>>> ShipMany(ShipRequest orders)
         {
@@ -112,6 +118,7 @@ namespace NorthWindAPI.Controllers
             return shippedOrders.ToList();
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ShipOptionResponse>> Carriers()
         {
@@ -120,6 +127,7 @@ namespace NorthWindAPI.Controllers
             return response;
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
