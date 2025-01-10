@@ -54,6 +54,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new CustomerRequestMap());
     cfg.AddProfile(new ProductDtoMap());
     cfg.AddProfile(new OrderResponseMap());
+    cfg.AddProfile(new UserDtoMap());
 
     cfg.AddCollectionMappers();
     cfg.UseEntityFrameworkCoreModel<AppDbContext>();

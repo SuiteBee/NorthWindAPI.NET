@@ -3,6 +3,7 @@ using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Infrastructure;
 using NorthWindAPI.Services.Interfaces;
+using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services
 {
@@ -21,22 +22,28 @@ namespace NorthWindAPI.Services
             _logger = logger;
 
         }
-        public async Task<bool> Authenticate(string usr, string pwd)
+        public async Task<AuthDto> Authenticate(string usr, string pwd)
         {
+            AuthDto auth = new AuthDto() { UserName = usr, Authorized = false };
             Auth toVerify = await _employeeRepository.GetUser(usr);
 
             if(toVerify == null)
             {
-                return false;
+                return auth;
             }
             else if(toVerify.Hash == null)
             {
-                return false;
+                return auth;
             }
-            else
+            else if(AuthManager.Verify(pwd, toVerify.Hash))
             {
-                return AuthManager.Verify(pwd, toVerify.Hash);
+                auth.Authorized = true;
+                auth.EmployeeId = toVerify.EmployeeId;
+                auth.RoleId = toVerify.RoleId;
+                return auth;
             }
+
+            return auth;
         }
 
         public async Task<bool> ChangePass(string usr, string previous, string pwd)

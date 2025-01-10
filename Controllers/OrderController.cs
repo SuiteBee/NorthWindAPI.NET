@@ -4,7 +4,6 @@ using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using AutoMapper;
-using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Controllers
 {

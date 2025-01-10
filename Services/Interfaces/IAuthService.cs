@@ -1,10 +1,10 @@
-﻿using NorthWindAPI.Data.Resources;
+﻿using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services.Interfaces
 {
     public interface IAuthService
     {
-        public Task<bool> Authenticate(string usr, string pwd);
+        public Task<AuthDto> Authenticate(string usr, string pwd);
 
         public Task<bool> ChangePass(string usr, string previous, string pwd);
     }

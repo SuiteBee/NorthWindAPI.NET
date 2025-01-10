@@ -22,6 +22,11 @@ namespace NorthWindAPI.Data.Repositories
             return _context.Auth.AsQueryable();
         }
 
+        private IQueryable<Role> QueryRole()
+        {
+            return _context.Role.AsQueryable();
+        }
+
         public async Task<Employee?> FindEmployee(int id)
         {
             return await _baseEmployeeRepo.FindEntityAsync(id);
@@ -35,6 +40,11 @@ namespace NorthWindAPI.Data.Repositories
         public async Task<Auth> GetUser(string usr)
         {
             return await QueryAuth().Where(x => x.Username == usr).FirstAsync();
+        }
+
+        public async Task<Role> GetRole(int id)
+        {
+            return await QueryRole().Where(x => x.Id == id).FirstAsync();
         }
 
         public async Task<Auth?> UpdateUser(int authId, Auth user)

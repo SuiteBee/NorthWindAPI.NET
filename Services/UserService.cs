@@ -26,6 +26,18 @@ namespace NorthWindAPI.Services
             return _mapper.Map<EmployeeDto>(employee);
         }
 
+        public async Task<UserDto> FindUser(AuthDto auth)
+        {
+            var employee = await _employeeRepository.FindEmployee(auth.EmployeeId);
+            var role = await _employeeRepository.GetRole(auth.RoleId);
+
+            var user = new UserDto() { UserName = auth.UserName };
+            _mapper.Map(employee, user);
+            _mapper.Map(role, user);
+
+            return user;
+        }
+
         public async Task<IEnumerable<EmployeeDto>> ListEmployees()
         {
             var employees = await _employeeRepository.AllEmployees();
