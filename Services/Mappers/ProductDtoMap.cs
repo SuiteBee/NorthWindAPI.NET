@@ -28,11 +28,11 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.Street, o => o.MapFrom(s => s.Address));
         }
 
-        private string ExtractWebsite(string? homepage)
+        private static string ExtractWebsite(string? homepage)
         {
             if (homepage != null && homepage.Contains('#'))
             {
-                Regex extracted = new Regex(@"#(.*?)#");
+                Regex extracted = new(@"#(.*?)#");
                 return extracted.Match(homepage).Groups[1].Value;
             }
 

@@ -7,20 +7,12 @@ using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Services
 {
-    public class CustomerService : ICustomerService
+    public class CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger) : ICustomerService
     {
-        private readonly ICustomerRepository _customerRepository;
+        private readonly ICustomerRepository _customerRepository = customerRepository;
 
-        private readonly IMapper _mapper;
-        private readonly ILogger<CustomerService> _logger;
-
-        public CustomerService(ICustomerRepository customerRepository, IMapper mapper, ILogger<CustomerService> logger)
-        {
-            _customerRepository = customerRepository;
-
-            _mapper = mapper;
-            _logger = logger;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly ILogger<CustomerService> _logger = logger;
 
         public async Task<CustomerDto> FindCustomer(string id)
         {
@@ -36,8 +28,8 @@ namespace NorthWindAPI.Services
         {
             var customers = await _customerRepository.AllCustomers();
             var toReturn = _mapper.Map<IEnumerable<CustomerDto>>(customers);
-            
-            foreach(CustomerDto dto in toReturn)
+
+            foreach (CustomerDto dto in toReturn)
             {
                 var currentCust = customers.First(x => x.Id == dto.Id);
                 _mapper.Map(currentCust, dto.ContactInfo);

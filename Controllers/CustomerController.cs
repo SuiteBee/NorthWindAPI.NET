@@ -9,16 +9,10 @@ namespace NorthWindAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[Action]")]
-    public class CustomerController : ControllerBase
+    public class CustomerController(ICustomerService customerService, ILogger<UserController> logger) : ControllerBase
     {
-        private readonly ICustomerService _customerService;
-        private readonly ILogger<UserController> _logger;
-
-        public CustomerController(ICustomerService customerService, ILogger<UserController> logger)
-        {
-            _customerService = customerService;
-            _logger = logger;
-        }
+        private readonly ICustomerService _customerService = customerService;
+        private readonly ILogger<UserController> _logger = logger;
 
         [Authorize]
         [HttpGet]
@@ -50,7 +44,7 @@ namespace NorthWindAPI.Controllers
         public async Task<ActionResult<RegionsResponse>> Regions()
         {
             var customerRegions = await _customerService.CustomerRegions();
-            RegionsResponse response = new RegionsResponse() { Regions = customerRegions };
+            RegionsResponse response = new() { Regions = customerRegions };
             return response;
         }
 

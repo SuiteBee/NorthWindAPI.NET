@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Infrastructure;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 namespace NorthWindAPI.Services
 {
@@ -33,15 +32,15 @@ namespace NorthWindAPI.Services
             AuthDto auth = new AuthDto() { UserName = usr, Authorized = false };
             Auth toVerify = await _employeeRepository.GetUser(usr);
 
-            if(toVerify == null)
+            if (toVerify == null)
             {
                 return auth;
             }
-            else if(toVerify.Hash == null)
+            else if (toVerify.Hash == null)
             {
                 return auth;
             }
-            else if(AuthManager.Verify(pwd, toVerify.Hash))
+            else if (AuthManager.Verify(pwd, toVerify.Hash))
             {
                 auth.Authorized = true;
                 auth.EmployeeId = toVerify.EmployeeId;
@@ -60,7 +59,7 @@ namespace NorthWindAPI.Services
             var Sectoken = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
               null,
-              expires: DateTime.Now.AddMinutes(120),
+              expires: DateTime.Now.AddMinutes(30),
               signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(Sectoken);
@@ -79,7 +78,7 @@ namespace NorthWindAPI.Services
                 //Temporary until users have valid pass
                 return false;
             }
-            else if(AuthManager.Verify(previous, user.Hash))
+            else if (AuthManager.Verify(previous, user.Hash))
             {
                 var newHash = AuthManager.Hash(pwd);
                 user.Hash = newHash;

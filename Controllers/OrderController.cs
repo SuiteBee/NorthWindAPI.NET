@@ -1,38 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NorthWindAPI.Services.ResponseDto;
-using NorthWindAPI.Services.Interfaces;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+using NorthWindAPI.Services.Interfaces;
+using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[Action]")]
-    public class OrderController : ControllerBase
+    public class OrderController(
+        IOrderService orderService,
+        ICustomerService customerService,
+        IUserService employeeService,
+        IMapper mapper,
+        ILogger<OrderController> logger
+    ) : ControllerBase
     {
-        private readonly IOrderService _orderService;
-        private readonly ICustomerService _customerService;
-        private readonly IUserService _employeeService;
+        private readonly IOrderService _orderService = orderService;
+        private readonly ICustomerService _customerService = customerService;
+        private readonly IUserService _employeeService = employeeService;
 
-        private readonly IMapper _mapper;
-        private readonly ILogger<OrderController> _logger;
-
-        public OrderController(
-            IOrderService orderService, 
-            ICustomerService customerService,
-            IUserService employeeService,
-            IMapper mapper, 
-            ILogger<OrderController> logger)
-        {
-            _orderService = orderService;
-            _customerService = customerService;
-            _employeeService = employeeService;
-
-            _mapper = mapper;
-            _logger = logger;
-        }
+        private readonly IMapper _mapper = mapper;
+        private readonly ILogger<OrderController> _logger = logger;
 
         [Authorize]
         [HttpGet]
@@ -44,7 +35,7 @@ namespace NorthWindAPI.Controllers
 
             var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
 
-            foreach(OrderResponse order in orderResponse)
+            foreach (OrderResponse order in orderResponse)
             {
                 var customerId = order.OrderedBy.Id;
                 order.OrderedBy = customers.First(x => x.Id == customerId);
@@ -53,7 +44,7 @@ namespace NorthWindAPI.Controllers
                 order.CompletedBy = employees.First(x => x.Id == employeeId);
             }
 
-            if (orderResponse == null || !orderResponse.Any())
+            if (orderResponse == null || orderResponse.Count == 0)
             {
                 return NotFound();
             }
@@ -76,7 +67,7 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch(Exception ex)
+            catch
             {
                 return NotFound(id);
             }
@@ -123,7 +114,7 @@ namespace NorthWindAPI.Controllers
         public async Task<ActionResult<ShipOptionResponse>> Carriers()
         {
             var carriers = await _orderService.Carriers();
-            ShipOptionResponse response = new ShipOptionResponse() { Carriers = carriers };
+            ShipOptionResponse response = new() { Carriers = carriers };
             return response;
         }
 

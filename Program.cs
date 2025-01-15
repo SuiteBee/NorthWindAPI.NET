@@ -1,21 +1,19 @@
 
-using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-
-using NorthWindAPI.Services;
-using NorthWindAPI.Data.Context;
-
-using NorthWindAPI.Services.Mappers;
-using NorthWindAPI.Services.Interfaces;
-using NorthWindAPI.Data.RepositoryInterfaces;
-using NorthWindAPI.Data.Repositories;
-using NorthWindAPI.Views.Interfaces;
-using NorthWindAPI.Views;
-
 using AutoMapper;
 using AutoMapper.EquivalencyExpression;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using NorthWindAPI.Controllers.Mappers;
+using NorthWindAPI.Data.Context;
+using NorthWindAPI.Data.Repositories;
+using NorthWindAPI.Data.RepositoryInterfaces;
+using NorthWindAPI.Services;
+using NorthWindAPI.Services.Interfaces;
+using NorthWindAPI.Services.Mappers;
+using NorthWindAPI.Views;
+using NorthWindAPI.Views.Interfaces;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

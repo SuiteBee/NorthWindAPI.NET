@@ -8,24 +8,17 @@ namespace NorthWindAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[Action]")]
-    public class UserController : ControllerBase
+    public class UserController(IAuthService authService, IUserService userService, ILogger<UserController> logger) : ControllerBase
     {
-        private readonly IAuthService _authService;
-        private readonly IUserService _userService;
-        private readonly ILogger<UserController> _logger;
-
-        public UserController(IAuthService authService, IUserService userService, ILogger<UserController> logger)
-        {
-            _authService = authService;
-            _userService = userService;
-            _logger = logger;
-        }
+        private readonly IAuthService _authService = authService;
+        private readonly IUserService _userService = userService;
+        private readonly ILogger<UserController> _logger = logger;
 
         [HttpPost]
         public async Task<ActionResult<UserResponse>> Authenticate(AuthRequest credentials)
         {
             var response = new UserResponse();
-            var auth = await _authService.Authenticate(credentials.usr, credentials.pwd);
+            var auth = await _authService.Authenticate(credentials.Usr, credentials.Pwd);
 
             if (auth.Authorized)
             {
@@ -41,7 +34,7 @@ namespace NorthWindAPI.Controllers
         [HttpPut]
         public async Task<ActionResult> Update(AuthUpdateRequest credentials)
         {
-            bool success = await _authService.ChangePass(credentials.usr, credentials.pwd, credentials.newPwd);
+            bool success = await _authService.ChangePass(credentials.Usr, credentials.Pwd, credentials.NewPwd);
             if (success) return Accepted();
             else return Unauthorized();
         }

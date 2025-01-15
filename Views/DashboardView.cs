@@ -5,30 +5,21 @@ using NorthWindAPI.Views.Interfaces;
 
 namespace NorthWindAPI.Views
 {
-    public class DashboardView : IDashboardView
+    public class DashboardView(
+        IOrderService orderService,
+        IProductService productService,
+        ICustomerService customerService,
+        IMapper mapper, ILogger<DashboardView> logger
+    ) : IDashboardView
     {
-        private readonly IOrderService _orderService;
-        private readonly IProductService _productService;
-        private readonly ICustomerService _customerService;
+        private readonly IOrderService _orderService = orderService;
+        private readonly IProductService _productService = productService;
+        private readonly ICustomerService _customerService = customerService;
 
-        private readonly IMapper _mapper;
-        private readonly ILogger<DashboardView> _logger;
+        private readonly IMapper _mapper = mapper;
+        private readonly ILogger<DashboardView> _logger = logger;
 
         private readonly string dateFormat = "yyyy-MM-dd";
-
-        public DashboardView(
-            IOrderService orderService,
-            IProductService productService,
-            ICustomerService customerService,
-            IMapper mapper, ILogger<DashboardView> logger)
-        {
-            _orderService = orderService;
-            _productService = productService;
-            _customerService = customerService;
-
-            _mapper = mapper;
-            _logger = logger;
-        }
 
         #region " Data Sets "
 
@@ -40,14 +31,15 @@ namespace NorthWindAPI.Views
             var productList = await _productService.ListProducts();
             var clientList = await _customerService.ListCustomers();
 
-            var orderTotals = new TotalsDto();
-
-            orderTotals.NumOrders = orderList.Count();
-            orderTotals.RevenueTotal = orderList.Sum(o => o.OrderSubtotal);
-            orderTotals.NumClients = clientList.Count();
-            orderTotals.NumProducts = productList.Count(p => !p.Discontinued);
-            orderTotals.ProductsSold = orderList.SelectMany(o => o.Items).Sum(i => i.Quantity);
-            orderTotals.Countries = orderList.Select(o => o.SendTo.Address.Country).Distinct().Count();
+            var orderTotals = new TotalsDto
+            {
+                NumOrders = orderList.Count(),
+                RevenueTotal = orderList.Sum(o => o.OrderSubtotal),
+                NumClients = clientList.Count(),
+                NumProducts = productList.Count(p => !p.Discontinued),
+                ProductsSold = orderList.SelectMany(o => o.Items).Sum(i => i.Quantity),
+                Countries = orderList.Select(o => o.SendTo.Address.Country).Distinct().Count()
+            };
 
             return orderTotals;
         }
@@ -74,7 +66,7 @@ namespace NorthWindAPI.Views
             return totalsByYear;
         }
 
-        private RevenueDto CalculateYearTotals(IGrouping<string, OrderDto> orderYear)
+        private static RevenueDto CalculateYearTotals(IGrouping<string, OrderDto> orderYear)
         {
             var currentYear = orderYear.Key;
             var currentYearTotal = orderYear.Sum(o => o.OrderTotal);
@@ -83,7 +75,7 @@ namespace NorthWindAPI.Views
             return currentTotalDto;
         }
 
-        private void CalculateQuarterTotals(RevenueDto currentTotalDto, IGrouping<string, OrderDto> orderYear)
+        private static void CalculateQuarterTotals(RevenueDto currentTotalDto, IGrouping<string, OrderDto> orderYear)
         {
             var ordersByQuarter = orderYear.GroupBy(o => (int.Parse(o.OrderDate.Substring(5, 2)) - 1) / 3);
 
@@ -141,7 +133,7 @@ namespace NorthWindAPI.Views
             return totalsByCategory;
         }
 
-        private CategoryRatiosDto CalculateCategoryTotal(decimal allTotal, IGrouping<string, OrderItemDto> items)
+        private static CategoryRatiosDto CalculateCategoryTotal(decimal allTotal, IGrouping<string, OrderItemDto> items)
         {
             var catTotal = items.Sum(c => c.FinalPrice);
             var catPercentage = Math.Round(decimal.Divide(catTotal, allTotal) * 100);
@@ -211,7 +203,7 @@ namespace NorthWindAPI.Views
             return categoriesByYear.OrderBy(x => x.Year);
         }
 
-        private CategoryRevenueDto CalculateCategoryYear(IGrouping<int, OrderDto> orderYear)
+        private static CategoryRevenueDto CalculateCategoryYear(IGrouping<int, OrderDto> orderYear)
         {
             var categoriesByYear = orderYear.SelectMany(o => o.Items).GroupBy(i => i.CategoryName);
             var currentYearCategoryTotal = new CategoryRevenueDto() { Year = orderYear.Key };
@@ -282,7 +274,7 @@ namespace NorthWindAPI.Views
             return categoriesByMonth.OrderBy(x => x.Month);
         }
 
-        private CategoryHeatmapDto CountCategoryItemsMonth(IGrouping<int, OrderDto> orderMonth)
+        private static CategoryHeatmapDto CountCategoryItemsMonth(IGrouping<int, OrderDto> orderMonth)
         {
             var categoriesByMonth = orderMonth.SelectMany(o => o.Items).GroupBy(i => i.CategoryName);
             var currentMonthCategoryItems = new CategoryHeatmapDto() { Month = orderMonth.Key };

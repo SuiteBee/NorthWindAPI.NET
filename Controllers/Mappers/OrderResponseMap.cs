@@ -2,7 +2,7 @@
 using NorthWindAPI.Controllers.Models.Responses;
 using NorthWindAPI.Services.ResponseDto;
 
-namespace NorthWindAPI.Services.Mappers
+namespace NorthWindAPI.Controllers.Mappers
 {
     public class OrderResponseMap : Profile
     {

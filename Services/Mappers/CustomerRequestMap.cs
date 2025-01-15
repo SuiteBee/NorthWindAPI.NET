@@ -15,6 +15,6 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Street));
 
             CreateMap<ContactRequest, Customer>();
-        }    
+        }
     }
 }

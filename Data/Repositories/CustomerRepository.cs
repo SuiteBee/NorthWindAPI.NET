@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using NorthWindAPI.Data.Context;
+﻿using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 

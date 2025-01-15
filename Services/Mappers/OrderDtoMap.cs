@@ -24,7 +24,7 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.Country, o => o.MapFrom(s => s.ShipCountry))
                 .ForMember(d => d.Region, o => o.MapFrom(s => s.ShipRegion));
 
-            
+
             CreateMap<Product, OrderItemDto>()
                 .ForMember(d => d.ItemPrice, o => o.MapFrom(s => s.UnitPrice));
 

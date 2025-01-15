@@ -3,7 +3,7 @@
     public class NewOrderRequest
     {
         public required string CustomerId { get; set; }
-        public required int EmployeeId { get;set; }
+        public required int EmployeeId { get; set; }
         public required int CarrierId { get; set; }
         public required decimal ShipCost { get; set; }
         public required string ShipName { get; set; }

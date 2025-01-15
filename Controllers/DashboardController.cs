@@ -8,36 +8,29 @@ namespace NorthWindAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[Action]")]
-    public class DashboardController : ControllerBase
+    public class DashboardController(
+        IDashboardView dashboardView,
+        IMapper mapper,
+        ILogger<DashboardController> logger
+    ) : ControllerBase
     {
-        private readonly IDashboardView _dashboardView;
-
-        private readonly IMapper _mapper;
-        private readonly ILogger<DashboardController> _logger;
-
-        public DashboardController(
-            IDashboardView dashboardView,
-            IMapper mapper,
-            ILogger<DashboardController> logger)
-        {
-            _dashboardView = dashboardView;
-
-            _mapper = mapper;
-            _logger = logger;
-        }
+        private readonly IDashboardView _dashboardView = dashboardView;
+        private readonly IMapper _mapper = mapper;
+        private readonly ILogger<DashboardController> _logger = logger;
 
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<ChartsResponse>> Charts()
         {
-            var response = new ChartsResponse();
-
-            response.Totals = await _dashboardView.GetTotals();
-            response.Revenue = await _dashboardView.RevenueTotals();
-            response.Categories = await _dashboardView.CategoryRatios();
-            response.CategoryRevenue = await _dashboardView.CategoryRevenue();
-            response.PendingShipments = await _dashboardView.PendingShipments();
-            response.CategoryHeatmap = await _dashboardView.CategoryHeatmap();
+            var response = new ChartsResponse()
+            {
+                Totals = await _dashboardView.GetTotals(),
+                Revenue = await _dashboardView.RevenueTotals(),
+                Categories = await _dashboardView.CategoryRatios(),
+                CategoryRevenue = await _dashboardView.CategoryRevenue(),
+                PendingShipments = await _dashboardView.PendingShipments(),
+                CategoryHeatmap = await _dashboardView.CategoryHeatmap()
+            };
 
             return response;
         }

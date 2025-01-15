@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-
-namespace NorthWindAPI.Infrastructure
+﻿namespace NorthWindAPI.Infrastructure
 {
     public static class AutoMapperExtension
     {

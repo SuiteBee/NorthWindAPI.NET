@@ -100,7 +100,7 @@ namespace NorthWindAPI.Data.Repositories
         public async Task<bool> DeleteOrder(int id)
         {
             List<OrderDetail> detailsToRemove = await FindDetail(id);
-            foreach(OrderDetail detail in detailsToRemove)
+            foreach (OrderDetail detail in detailsToRemove)
             {
                 await _baseDetailRepo.RemoveDependentEntityAsync(detail.Id);
             }

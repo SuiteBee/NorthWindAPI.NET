@@ -2,7 +2,7 @@
 {
     public class AuthRequest
     {
-        public required string usr { get; set; }
-        public required string pwd { get; set; }
+        public required string Usr { get; set; }
+        public required string Pwd { get; set; }
     }
 }

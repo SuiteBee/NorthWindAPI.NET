@@ -18,7 +18,7 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<IEnumerable<T>> ReturnEntityListAsync()
         {
-                return await _dbSet.ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<T?> FindEntityAsync(int id)
@@ -87,7 +87,7 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<T?> UpdateEntityAsync(int id, T entity)
         {
-            if( id != entity.Id)
+            if (id != entity.Id)
             {
                 return null;
             }
@@ -100,7 +100,7 @@ namespace NorthWindAPI.Data.Repositories
             }
             catch (DbUpdateConcurrencyException)
             {
-                if(!await _dbSet.AnyAsync(x => x.Id == id))
+                if (!await _dbSet.AnyAsync(x => x.Id == id))
                 {
                     return entity;
                 }
