@@ -2,6 +2,7 @@
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Services.Calculations;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -49,7 +50,7 @@ namespace NorthWindAPI.Services
                     _mapper.Map(cat, itemDto);
                     _mapper.Map(detail, itemDto);
 
-                    CalculateItemTotals(itemDto);
+                    OrderCalculations.ItemTotals(itemDto);
 
                     dto.Items.Add(itemDto);
                 }
@@ -57,7 +58,7 @@ namespace NorthWindAPI.Services
                 var shippedBy = carrierList.First(x => x.Id == order.ShipVia);
                 _mapper.Map(shippedBy, dto.SendTo);
 
-                CalculateOrderTotal(dto);
+                OrderCalculations.OrderTotal(dto);
             }
 
             return orderDto;
@@ -86,7 +87,7 @@ namespace NorthWindAPI.Services
                 _mapper.Map(cat, itemDto);
                 _mapper.Map(detail, itemDto);
 
-                CalculateItemTotals(itemDto);
+                OrderCalculations.ItemTotals(itemDto);
 
                 orderDto.Items.Add(itemDto);
             };
@@ -94,7 +95,7 @@ namespace NorthWindAPI.Services
             var shippedBy = await _orderRepository.FindCarrier(orderBase.ShipVia);
             _mapper.Map(shippedBy, orderDto.SendTo);
 
-            CalculateOrderTotal(orderDto);
+            OrderCalculations.OrderTotal(orderDto);
 
             return orderDto;
 
@@ -182,44 +183,5 @@ namespace NorthWindAPI.Services
 
         #endregion
 
-        #region " Business Logic "
-
-        private static void CalculateOrderTotal(OrderDto dto)
-        {
-            dto.OrderSubtotal = dto.Items.Sum(x => x.FinalPrice);
-            dto.OrderTotal = dto.OrderSubtotal + dto.SendTo.ShipCost;
-        }
-
-        private static void CalculateItemTotals(OrderItemDto dto)
-        {
-            dto.TotalPrice = GetTotalPrice(dto);
-            dto.DiscountAmt = GetDiscount(dto);
-            dto.FinalPrice = GetFinalPrice(dto);
-        }
-
-        private static decimal GetTotalPrice(OrderItemDto dto)
-        {
-            return Math.Round(dto.ItemPrice * dto.Quantity, 2);
-        }
-
-        private static decimal GetDiscount(OrderItemDto dto)
-        {
-            return dto.TotalPrice * (decimal)dto.Discount;
-        }
-
-        private static decimal GetFinalPrice(OrderItemDto dto)
-        {
-            if (dto.Discount > 0)
-            {
-                decimal finalPrice = dto.TotalPrice * (decimal)(1 - dto.Discount);
-                return Math.Round(finalPrice, 2);
-            }
-            else
-            {
-                return dto.TotalPrice;
-            }
-        }
-
-        #endregion
     }
 }
