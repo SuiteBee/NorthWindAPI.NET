@@ -10,8 +10,8 @@ namespace NorthWindAPI.Controllers.Models.Responses
         public decimal OrderTotal { get; set; }
         public bool Fulfilled { get; set; }
         public List<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
-        public required CustomerDto OrderedBy { get; set; } = new CustomerDto();
-        public required EmployeeDto CompletedBy { get; set; } = new EmployeeDto();
+        public required CustomerResponse OrderedBy { get; set; }
+        public required EmployeeResponse CompletedBy { get; set; }
         public required ShippingDto SendTo { get; set; } = new ShippingDto();
     }
 }

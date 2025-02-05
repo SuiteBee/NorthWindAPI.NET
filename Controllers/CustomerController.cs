@@ -78,7 +78,7 @@ namespace NorthWindAPI.Controllers
         }
 
         /// <summary>
-        /// Insert new customer record
+        /// Insert new customer record + Return inserted record
         /// </summary>
         /// <param name="newCustomer"></param>
         [ProducesResponseType(typeof(CustomerResponse), StatusCodes.Status201Created)]

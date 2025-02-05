@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
 using NorthWindAPI.Services.Interfaces;
-using NorthWindAPI.Services.ResponseDto;
 
 namespace NorthWindAPI.Controllers
 {
@@ -41,27 +40,27 @@ namespace NorthWindAPI.Controllers
 
             //Map initial Order list
             var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
-            //var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
-            //var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
+            var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
+            var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
+
+            if (orderResponse == null || orderResponse.Count == 0)
+            {
+                return NotFound();
+            }
 
             //Join customers on ID and return order list with customer info complete
-            orderResponse = orderResponse.Join(customers, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
+            orderResponse = orderResponse.Join(customerResponse, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
             {
                 order.OrderedBy = customer;
                 return order;
             }).ToList();
 
             //Join employees on ID and return order list with employee info complete
-            orderResponse = orderResponse.Join(employees, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
+            orderResponse = orderResponse.Join(employeeResponse, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
             {
                 order.CompletedBy = employee;
                 return order;
             }).ToList();
-
-            if (orderResponse == null || orderResponse.Count == 0)
-            {
-                return NotFound();
-            }
 
             //Opt for linq joins over loop and search
             //foreach (OrderResponse order in orderResponse)
@@ -80,7 +79,6 @@ namespace NorthWindAPI.Controllers
         /// Get single order record by ID
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
         [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
@@ -91,11 +89,13 @@ namespace NorthWindAPI.Controllers
             try
             {
                 var order = await _orderService.FindOrder(id);
-
                 var orderResponse = _mapper.Map<OrderResponse>(order);
+                
+                var customer = await _customerService.FindCustomer(order.CustomerId);
+                var employee = await _employeeService.FindEmployee(order.EmployeeId);
 
-                orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
-                orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+                orderResponse.OrderedBy = _mapper.Map<CustomerResponse>(customer);
+                orderResponse.CompletedBy = _mapper.Map<EmployeeResponse>(employee);
 
                 return orderResponse;
             }
@@ -105,51 +105,160 @@ namespace NorthWindAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// Insert new order record + Return inserted record
+        /// </summary>
+        /// <param name="newOrder"></param>
+        [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ForbidResult), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<OrderResponse>> Create(NewOrderRequest newOrder)
         {
-            var order = await _orderService.ProcessNewOrder(newOrder);
+            try
+            {
+                var order = await _orderService.ProcessNewOrder(newOrder);
 
-            var orderResponse = _mapper.Map<OrderResponse>(order);
+                if (order == null)
+                {
+                    return BadRequest();
+                }
 
-            orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
-            orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+                var orderResponse = _mapper.Map<OrderResponse>(order);
 
-            return orderResponse;
+                var customer = await _customerService.FindCustomer(order.CustomerId);
+                var employee = await _employeeService.FindEmployee(order.EmployeeId);
+
+                orderResponse.OrderedBy = _mapper.Map<CustomerResponse>(customer);
+                orderResponse.CompletedBy = _mapper.Map<EmployeeResponse>(employee);
+
+                return orderResponse;
+            }
+            catch
+            {
+                return Forbid();
+            }
         }
 
+        /// <summary>
+        /// Update order record ship date + Return order record
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="shipDate"></param>
+        [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ForbidResult), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<OrderResponse>> Ship(int id, string? shipDate = null)
         {
-            var order = await _orderService.MarkAsShipped(id, shipDate);
+            try
+            {
+                var order = await _orderService.MarkAsShipped(id, shipDate);
 
-            var orderResponse = _mapper.Map<OrderResponse>(order);
+                if (order == null)
+                {
+                    return BadRequest();
+                }
 
-            orderResponse.OrderedBy = await _customerService.FindCustomer(order.CustomerId);
-            orderResponse.CompletedBy = await _employeeService.FindEmployee(order.EmployeeId);
+                var orderResponse = _mapper.Map<OrderResponse>(order);
 
-            return orderResponse;
+                var customer = await _customerService.FindCustomer(order.CustomerId);
+                var employee = await _employeeService.FindEmployee(order.EmployeeId);
+
+                orderResponse.OrderedBy = _mapper.Map<CustomerResponse>(customer);
+                orderResponse.CompletedBy = _mapper.Map<EmployeeResponse>(employee);
+
+                return orderResponse;
+            }
+            catch
+            {
+                return Forbid();
+            }
         }
 
+        /// <summary>
+        /// Update multiple order shipping dates + Return collection of orders
+        /// </summary>
+        /// <param name="orders"></param>
+        [ProducesResponseType(typeof(IEnumerable<OrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ForbidResult), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpPut]
-        public async Task<ActionResult<IEnumerable<OrderDto>>> ShipMany(ShipRequest orders)
+        public async Task<ActionResult<IEnumerable<OrderResponse>>> ShipMany(ShipRequest orders)
         {
-            var shippedOrders = await _orderService.MarkAsShipped(orders);
-            return shippedOrders.ToList();
+            try
+            {
+                var shippedOrders = await _orderService.MarkAsShipped(orders);
+
+                var customers = await _customerService.ListCustomers();
+                var employees = await _employeeService.ListEmployees();
+
+                //Map initial Order list
+                var orderResponse = _mapper.Map<List<OrderResponse>>(shippedOrders);
+                var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
+                var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
+
+                if (orderResponse == null || orderResponse.Count == 0)
+                {
+                    return NotFound();
+                }
+
+                //Join customers on ID and return order list with customer info complete
+                orderResponse = orderResponse.Join(customerResponse, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
+                {
+                    order.OrderedBy = customer;
+                    return order;
+                }).ToList();
+
+                //Join employees on ID and return order list with employee info complete
+                orderResponse = orderResponse.Join(employeeResponse, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
+                {
+                    order.CompletedBy = employee;
+                    return order;
+                }).ToList();
+
+                return orderResponse;
+            }
+            catch
+            {
+                return Forbid();
+            }
         }
 
+        /// <summary>
+        /// Get list of all available carriers
+        /// </summary>
+        [ProducesResponseType(typeof(ShipOptionResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<ShipOptionResponse>> Carriers()
         {
             var carriers = await _orderService.Carriers();
+
+            if (carriers == null || carriers.ToList().Count == 0)
+            {
+                return NotFound();
+            }
+
             ShipOptionResponse response = new() { Carriers = carriers };
             return response;
         }
 
+        /// <summary>
+        /// Delete order record + order detail record
+        /// </summary>
+        /// <param name="id"></param>
+        [ProducesResponseType(typeof(NoContentResult), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)

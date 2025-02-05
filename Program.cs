@@ -78,7 +78,9 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new CustomerDtoMap());
     cfg.AddProfile(new CustomerRequestMap());
     cfg.AddProfile(new CustomerResponseMap());
+    cfg.AddProfile(new EmployeeResponseMap());
     cfg.AddProfile(new ProductDtoMap());
+    cfg.AddProfile(new ProductResponseMap());
     cfg.AddProfile(new OrderResponseMap());
     cfg.AddProfile(new UserDtoMap());
 

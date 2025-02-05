@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
@@ -14,6 +15,12 @@ namespace NorthWindAPI.Controllers
         private readonly IUserService _userService = userService;
         private readonly ILogger<UserController> _logger = logger;
 
+        /// <summary>
+        /// Validate user credentials + Return user info and token
+        /// </summary>
+        /// <param name="credentials"></param>
+        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [HttpPost]
         public async Task<ActionResult<UserResponse>> Authenticate(AuthRequest credentials)
         {
@@ -30,6 +37,13 @@ namespace NorthWindAPI.Controllers
             return Unauthorized(response);
         }
 
+        /// <summary>
+        /// Validate user credentials + Update user credentials
+        /// </summary>
+        /// <param name="credentials"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(AcceptedResult), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpPut]
         public async Task<ActionResult> Update(AuthUpdateRequest credentials)

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
 using NorthWindAPI.Services.Interfaces;
@@ -61,25 +62,25 @@ namespace NorthWindAPI.Services
             return prodDto;
         }
 
-        public async Task<ProductDto> PriceUpdate(int id, ProductDto prod)
+        public async Task<ProductDto> PriceUpdate(int id, PriceRequest price)
         {
             var prodBase = await _productRepository.FindProduct(id);
-            prodBase.UnitPrice = prod.ItemPrice;
+            prodBase.UnitPrice = price.ItemPrice;
 
             await _productRepository.UpdateProduct(id, prodBase);
             return await FindProduct(id);
         }
 
-        public async Task<ProductDto> AddStock(int id, ProductDto prod)
+        public async Task<ProductDto> AddStock(int id, StockRequest stock)
         {
             var prodBase = await _productRepository.FindProduct(id);
-            prodBase.UnitsInStock = prod.StockAmt;
+            prodBase.UnitsInStock = stock.StockAmt;
 
             await _productRepository.UpdateProduct(id, prodBase);
             return await FindProduct(id);
         }
 
-        public async Task<ProductDto> Update(int id, ProductDto prod)
+        public async Task<ProductDto> Update(int id, ProductRequest prod)
         {
             var prodBase = await _productRepository.FindProduct(id);
             prodBase.UnitsInStock = prod.StockAmt;

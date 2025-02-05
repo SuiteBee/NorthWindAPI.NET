@@ -4,7 +4,7 @@ namespace NorthWindAPI.Services.ResponseDto
 {
     public class ShippingDto
     {
-        public int Id { get; set; }
+        public int CarrierId { get; set; }
         public required string ShippedDate { get; set; }
         public required string ShipCarrier { get; set; }
         public decimal ShipCost { get; set; }

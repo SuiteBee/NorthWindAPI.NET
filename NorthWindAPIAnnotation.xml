@@ -22,7 +22,7 @@
         </member>
         <member name="M:NorthWindAPI.Controllers.CustomerController.Create(NorthWindAPI.Controllers.Models.Requests.CustomerRequest)">
             <summary>
-            Insert new customer record
+            Insert new customer record + Return inserted record
             </summary>
             <param name="newCustomer"></param>
         </member>
@@ -113,6 +113,127 @@
             <summary>
             Company location address
             </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.NewOrderRequest.CustomerId">
+            <summary>
+            Unique customer identifier
+            </summary>
+            <example>RBEE</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.NewOrderRequest.EmployeeId">
+            <summary>
+            Unique employee identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.NewOrderRequest.CarrierId">
+            <summary>
+            Unique shipping carrier identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.NewOrderRequest.ShipCost">
+            <summary>
+            Shipping cost
+            </summary>
+            <example>99.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.NewOrderRequest.ShipName">
+            <summary>
+            Shipping carrier name
+            </summary>
+            <example>Speedy Express</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.OrderDetailRequest.ProductId">
+            <summary>
+            Unique product identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.OrderDetailRequest.Quantity">
+            <summary>
+            Quantity of product ordered
+            </summary>
+            <example>12</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.OrderDetailRequest.Discount">
+            <summary>
+            Discount percentage to apply
+            </summary>
+            <example>0.05</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.PriceRequest.ItemPrice">
+            <summary>
+            Product cost
+            </summary>
+            <example>18.50</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.ProductId">
+            <summary>
+            Unique product identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.ProductName">
+            <summary>
+            Product name
+            </summary>
+            <example>Chai</example>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.CategoryName" -->
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.CategoryDescription">
+            <summary>
+            Category Description
+            </summary>
+            <example>Soft drinks, coffees, teas, beers, and ales</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.ItemPrice">
+            <summary>
+            Product cost
+            </summary>
+            <example>18.50</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.StockAmt">
+            <summary>
+            Quantity of product left in stock
+            </summary>
+            <example>99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.InStock">
+            <summary>
+            Is product currently in stock
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ProductRequest.Discontinued">
+            <summary>
+            Has product been marked as discontinued
+            </summary>
+            <example>false</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ShipRequest.OrderIds">
+            <summary>
+            List of order ID's
+            </summary>
+            <example>1,2,3</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ShipRequest.ShipDate">
+            <summary>
+            Date shipped
+            </summary>
+            <example>2024-01-01</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.StockRequest.StockAmt">
+            <summary>
+            Quantity of product left in stock
+            </summary>
+            <example>99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.SupplierRequest.Company">
+            <summary>
+            Distributor Name
+            </summary>
+            <example>Exotic Liquids</example>
         </member>
         <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.Street">
             <summary>
@@ -208,11 +329,113 @@
             Company location address
             </summary>
         </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.EmployeeResponse.Id">
+            <summary>
+            Unique Employee Identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.EmployeeResponse.FirstName">
+            <summary>
+            Employee First Name
+            </summary>
+            <example>Tim</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.EmployeeResponse.LastName">
+            <summary>
+            Employee Last Name
+            </summary>
+            <example>Ryans</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.ProductId">
+            <summary>
+            Unique product identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.ProductName">
+            <summary>
+            Product name
+            </summary>
+            <example>Chai</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.CategoryName">
+            <summary>
+            Category name
+            </summary>
+            <example>Beverages</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.CategoryDescription">
+            <summary>
+            Category Description
+            </summary>
+            <example>Soft drinks, coffees, teas, beers, and ales</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.ItemPrice">
+            <summary>
+            Product cost
+            </summary>
+            <example>18.50</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.StockAmt">
+            <summary>
+            Quantity of product left in stock
+            </summary>
+            <example>99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.InStock">
+            <summary>
+            Is product currently in stock
+            </summary>
+            <example>true</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ProductResponse.Discontinued">
+            <summary>
+            Has product been marked as discontinued
+            </summary>
+            <example>false</example>
+        </member>
         <member name="P:NorthWindAPI.Controllers.Models.Responses.RegionsResponse.Regions">
             <summary>
             List of global regions
             </summary>
             <example>Central America,Western Europe,British Isles</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.CarrierId">
+            <summary>
+            Unique identifier for shipping carrier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.ShippedDate">
+            <summary>
+            Date product marked as shipped
+            </summary>
+            <example>2024-01-01</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.ShipCarrier">
+            <summary>
+            Shipping carrier name
+            </summary>
+            <example>Speedy Express</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.ShipCost">
+            <summary>
+            Shipping cost
+            </summary>
+            <example>99.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.ShipName">
+            <summary>
+            Shipment addressed to
+            </summary>
+            <example>Vins et alcools Chevalier</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.SupplierResponse.Company">
+            <summary>
+            Distributor Name
+            </summary>
+            <example>Exotic Liquids</example>
         </member>
         <member name="M:NorthWindAPI.Controllers.OrderController.All">
             <summary>
@@ -224,7 +447,95 @@
             Get single order record by ID
             </summary>
             <param name="id"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.Create(NorthWindAPI.Controllers.Models.Requests.NewOrderRequest)">
+            <summary>
+            Insert new order record + Return inserted record
+            </summary>
+            <param name="newOrder"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.Ship(System.Int32,System.String)">
+            <summary>
+            Update order record ship date + Return order record
+            </summary>
+            <param name="id"></param>
+            <param name="shipDate"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.ShipMany(NorthWindAPI.Controllers.Models.Requests.ShipRequest)">
+            <summary>
+            Update multiple order shipping dates + Return collection of orders
+            </summary>
+            <param name="orders"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.Carriers">
+            <summary>
+            Get list of all available carriers
+            </summary>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.Delete(System.Int32)">
+            <summary>
+            Delete order record + order detail record
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.ProductController.All">
+            <summary>
+            Get list of all available products
+            </summary>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.ProductController.Find(System.Int32)">
+            <summary>
+            Get single product record by ID
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.ProductController.Price(System.Int32,NorthWindAPI.Controllers.Models.Requests.PriceRequest)">
+            <summary>
+            Update product record cost + Return product record
+            </summary>
+            <param name="id"></param>
+            <param name="price"></param>
             <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.ProductController.Stock(System.Int32,NorthWindAPI.Controllers.Models.Requests.StockRequest)">
+            <summary>
+            Update product record stock quantity + Return product record
+            </summary>
+            <param name="id"></param>
+            <param name="stock"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.ProductController.Update(System.Int32,NorthWindAPI.Controllers.Models.Requests.ProductRequest)">
+            <summary>
+            Update product record + Return product record
+            </summary>
+            <param name="id"></param>
+            <param name="prod"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.UserController.Authenticate(NorthWindAPI.Controllers.Models.Requests.AuthRequest)">
+            <summary>
+            Validate user credentials + Return user info and token
+            </summary>
+            <param name="credentials"></param>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CarrierDto.Id">
+            <summary>
+            Unique carrier identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CarrierDto.CompanyName">
+            <summary>
+            Carrier name
+            </summary>
+            <example>Speedy Express</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CarrierDto.Phone">
+            <summary>
+            Carrier phone number
+            </summary>
+            <example>123-456-7890</example>
         </member>
         <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Month">
             <summary>

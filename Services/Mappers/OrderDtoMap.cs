@@ -15,6 +15,7 @@ namespace NorthWindAPI.Services.Mappers
                 .ForMember(d => d.ShipCost, o => o.MapFrom(s => s.Freight));
 
             CreateMap<Shipper, ShippingDto>()
+                .ForMember(d => d.CarrierId, o => o.MapFrom(s => s.Id))
                 .ForMember(d => d.ShipCarrier, o => o.MapFrom(s => s.CompanyName));
 
             CreateMap<Order, AddressDto>()
