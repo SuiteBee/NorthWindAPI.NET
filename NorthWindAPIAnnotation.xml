@@ -519,6 +519,13 @@
             </summary>
             <param name="credentials"></param>
         </member>
+        <member name="M:NorthWindAPI.Controllers.UserController.Update(NorthWindAPI.Controllers.Models.Requests.AuthUpdateRequest)">
+            <summary>
+            Validate user credentials + Update user credentials
+            </summary>
+            <param name="credentials"></param>
+            <returns></returns>
+        </member>
         <member name="P:NorthWindAPI.Services.ResponseDto.CarrierDto.Id">
             <summary>
             Unique carrier identifier
@@ -740,6 +747,42 @@
             Global number of countries with customers
             </summary>
             <example>9</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.EmployeeId">
+            <summary>
+            Unique employee identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.UserName">
+            <summary>
+            Unique employee username
+            </summary>
+            <example>tryans</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.FirstName">
+            <summary>
+            Employee first name
+            </summary>
+            <example>Tim</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.LastName">
+            <summary>
+            Employee last name
+            </summary>
+            <example>Ryans</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.RoleId">
+            <summary>
+            Unique employee role identifier
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.UserDto.RoleName">
+            <summary>
+            Employee role name
+            </summary>
+            <example>Admin</example>
         </member>
         <member name="M:NorthWindAPI.Data.Repositories.BaseAltRepository`1.RemoveEntityAsync(System.String)">
             <summary>

@@ -13,7 +13,7 @@ namespace NorthWindAPI.Data.Context
         {
             if (!builder.IsConfigured)
             {
-                builder.UseSqlite("DefaultConnection");
+                builder.UseSqlite("SqliteConnection");
             }
 
             base.OnConfiguring(builder);

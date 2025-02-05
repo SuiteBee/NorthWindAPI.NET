@@ -43,7 +43,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 // Register Servies
 /////////////////////////////////////////////////////////////
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(configuration.GetConnectionString("SqliteConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
