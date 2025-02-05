@@ -1,0 +1,469 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NorthWindAPI</name>
+    </assembly>
+    <members>
+        <member name="M:NorthWindAPI.Controllers.CustomerController.All">
+            <summary>
+            Get list of all existing customer records
+            </summary>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.CustomerController.Find(System.String)">
+            <summary>
+            Get single customer record by ID
+            </summary>
+            <param name="id">RBEE</param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.CustomerController.Regions">
+            <summary>
+            Get list of unique customer global regions
+            </summary>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.CustomerController.Create(NorthWindAPI.Controllers.Models.Requests.CustomerRequest)">
+            <summary>
+            Insert new customer record
+            </summary>
+            <param name="newCustomer"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.CustomerController.Update(System.String,NorthWindAPI.Controllers.Models.Requests.CustomerRequest)">
+            <summary>
+            Update existing customer record
+            </summary>
+            <param name="id"></param>
+            <param name="existingCustomer"></param>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.DashboardController.Charts">
+            <summary>
+            Get chart data for dashboard display
+            </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.AddressRequest.Street">
+            <summary>
+            Street name and number
+            </summary>
+            <example>123 Test St.</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.AddressRequest.City">
+            <summary>
+            City name
+            </summary>
+            <example>Cleveland</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.AddressRequest.PostalCode">
+            <summary>
+            Zip code
+            </summary>
+            <example>44144</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.AddressRequest.Country">
+            <summary>
+            Country name
+            </summary>
+            <example>USA</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.AddressRequest.Region">
+            <summary>
+            Global region
+            </summary>
+            <example>North America</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ContactRequest.ContactName">
+            <summary>
+            Company rep contact name
+            </summary>
+            <example>Ryan Bee</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ContactRequest.ContactTitle">
+            <summary>
+            Company rep position title
+            </summary>
+            <example>Supreme Overlord</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ContactRequest.Phone">
+            <summary>
+            Phone number
+            </summary>
+            <example>123-456-7890</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.ContactRequest.Fax">
+            <summary>
+            Optional fax number
+            </summary>
+            <example>123-456-7890</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.CustomerRequest.CompanyIdentifier">
+            <summary>
+            Unique string identifier
+            </summary>
+            <example>RBEE</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.CustomerRequest.CompanyName">
+            <summary>
+            Company full name
+            </summary>
+            <example>The Very Best Bakery</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.CustomerRequest.ContactInfo">
+            <summary>
+            Company contact info
+            </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Requests.CustomerRequest.Address">
+            <summary>
+            Company location address
+            </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.Street">
+            <summary>
+            Street name and number
+            </summary>
+            <example>123 Test St.</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.City">
+            <summary>
+            City name
+            </summary>
+            <example>Cleveland</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.PostalCode">
+            <summary>
+            Zip code
+            </summary>
+            <example>44144</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.Country">
+            <summary>
+            Country name
+            </summary>
+            <example>USA</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.AddressResponse.Region">
+            <summary>
+            Global region
+            </summary>
+            <example>North America</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ChartsResponse.PendingShipments">
+            <summary>
+            Count for orders not yet marked as shipped
+            </summary>
+            <example>99</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.ContactName">
+            <summary>
+            Company rep contact name
+            </summary>
+            <example>Ryan Bee</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.ContactTitle">
+            <summary>
+            Company rep position title
+            </summary>
+            <example>Supreme Overlord</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.CourtestyTitle">
+            <summary>
+            Optional honorific
+            </summary>
+            <example>Mr.</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.Phone">
+            <summary>
+            Phone number
+            </summary>
+            <example>123-456-7890</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.Fax">
+            <summary>
+            Optional fax number
+            </summary>
+            <example>123-456-7890</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.ContactResponse.Website">
+            <summary>
+            Optional web address
+            </summary>
+            <example>www.companywebsite.com</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.CustomerResponse.Id">
+            <summary>
+            Unique string identifier
+            </summary>
+            <example>CUST</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.CustomerResponse.CompanyName">
+            <summary>
+            Company full name
+            </summary>
+            <example>The Very Best Bakery</example>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.CustomerResponse.ContactInfo">
+            <summary>
+            Company contact info
+            </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.CustomerResponse.Address">
+            <summary>
+            Company location address
+            </summary>
+        </member>
+        <member name="P:NorthWindAPI.Controllers.Models.Responses.RegionsResponse.Regions">
+            <summary>
+            List of global regions
+            </summary>
+            <example>Central America,Western Europe,British Isles</example>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.All">
+            <summary>
+            Get list of all existing orders
+            </summary>
+        </member>
+        <member name="M:NorthWindAPI.Controllers.OrderController.Find(System.Int32)">
+            <summary>
+            Get single order record by ID
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Month">
+            <summary>
+            Numeric month of the year
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Beverages">
+            <summary>
+            Number of sales for beverages
+            </summary>
+            <example>1</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Condiments">
+            <summary>
+            Number of sales for condiments
+            </summary>
+            <example>2</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Confections">
+            <summary>
+            Number of sales for confections
+            </summary>
+            <example>3</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Dairy">
+            <summary>
+            Number of sales for dairy
+            </summary>
+            <example>4</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Grains">
+            <summary>
+            Number of sales for grains
+            </summary>
+            <example>5</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Meat">
+            <summary>
+            Number of sales for meat
+            </summary>
+            <example>6</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Produce">
+            <summary>
+            Number of sales for produce
+            </summary>
+            <example>7</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryHeatmapDto.Seafood">
+            <summary>
+            Number of sales for seafood
+            </summary>
+            <example>8</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRatiosDto.Category">
+            <summary>
+            Product category
+            </summary>
+            <example>Meat/Poultry</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRatiosDto.Percentage">
+            <summary>
+            Percentage of total revenue for category
+            </summary>
+            <example>13</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Year">
+            <summary>
+            Revenue year
+            </summary>
+            <example>2024</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Beverages">
+            <summary>
+            Revenue total for beverages
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Condiments">
+            <summary>
+            Revenue total for condiments
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Confections">
+            <summary>
+            Revenue total for confections
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Dairy">
+            <summary>
+            Revenue total for dairy
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Grains">
+            <summary>
+            Revenue total for grains
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Meat">
+            <summary>
+            Revenue total for meat
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Produce">
+            <summary>
+            Revenue total for produce
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.CategoryRevenueDto.Seafood">
+            <summary>
+            Revenue total for seafood
+            </summary>
+            <example>999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RegionDto.Region">
+            <summary>
+            Global region
+            </summary>
+            <example>North America</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RegionDto.Country">
+            <summary>
+            Country name
+            </summary>
+            <example>USA</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.Year">
+            <summary>
+            Revenue year
+            </summary>
+            <example>2024</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.Total">
+            <summary>
+            Total revenue for the year
+            </summary>
+            <example>400.40</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.QuarterOne">
+            <summary>
+            Total revenue for quarter one
+            </summary>
+            <example>100.10</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.QuarterTwo">
+            <summary>
+            Total revenue for quarter two
+            </summary>
+            <example>100.10</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.QuarterThree">
+            <summary>
+            Total revenue for quarter three
+            </summary>
+            <example>100.10</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.RevenueDto.QuarterFour">
+            <summary>
+            Total revenue for quarter four
+            </summary>
+            <example>100.10</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.NumOrders">
+            <summary>
+            Global order count
+            </summary>
+            <example>999</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.RevenueTotal">
+            <summary>
+            Global revenue total
+            </summary>
+            <example>999999.99</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.NumClients">
+            <summary>
+            Global number of customers
+            </summary>
+            <example>999</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.NumProducts">
+            <summary>
+            Global number of available products
+            </summary>
+            <example>111</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.ProductsSold">
+            <summary>
+            Global number of products sold
+            </summary>
+            <example>999</example>
+        </member>
+        <member name="P:NorthWindAPI.Services.ResponseDto.TotalsDto.Countries">
+            <summary>
+            Global number of countries with customers
+            </summary>
+            <example>9</example>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.BaseAltRepository`1.RemoveEntityAsync(System.String)">
+            <summary>
+            Delete entity and save changes to database
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.BaseAltRepository`1.RemoveDependentEntityAsync(System.String)">
+            <summary>
+            Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.RemoveEntityAsync(System.Int32)">
+            <summary>
+            Delete entity and save changes to database
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.RemoveDependentEntityAsync(System.Int32)">
+            <summary>
+            Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.OrderRepository.DeleteOrder(System.Int32)">
+            <summary>
+            Delete all associated detail records and delete parent record. Changes are saved when parent is removed.
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

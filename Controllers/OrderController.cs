@@ -25,6 +25,12 @@ namespace NorthWindAPI.Controllers
         private readonly IMapper _mapper = mapper;
         private readonly ILogger<OrderController> _logger = logger;
 
+        /// <summary>
+        /// Get list of all existing orders
+        /// </summary>
+        [ProducesResponseType(typeof(IEnumerable<OrderResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderResponse>>> All()
@@ -33,25 +39,51 @@ namespace NorthWindAPI.Controllers
             var customers = await _customerService.ListCustomers();
             var employees = await _employeeService.ListEmployees();
 
+            //Map initial Order list
             var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
+            //var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
+            //var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
 
-            foreach (OrderResponse order in orderResponse)
+            //Join customers on ID and return order list with customer info complete
+            orderResponse = orderResponse.Join(customers, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
             {
-                var customerId = order.OrderedBy.Id;
-                order.OrderedBy = customers.First(x => x.Id == customerId);
+                order.OrderedBy = customer;
+                return order;
+            }).ToList();
 
-                var employeeId = order.CompletedBy.Id;
-                order.CompletedBy = employees.First(x => x.Id == employeeId);
-            }
+            //Join employees on ID and return order list with employee info complete
+            orderResponse = orderResponse.Join(employees, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
+            {
+                order.CompletedBy = employee;
+                return order;
+            }).ToList();
 
             if (orderResponse == null || orderResponse.Count == 0)
             {
                 return NotFound();
             }
 
+            //Opt for linq joins over loop and search
+            //foreach (OrderResponse order in orderResponse)
+            //{
+            //    var customerId = order.OrderedBy.Id;
+            //    order.OrderedBy = customers.First(x => x.Id == customerId);
+
+            //    var employeeId = order.CompletedBy.Id;
+            //    order.CompletedBy = employees.First(x => x.Id == employeeId);
+            //}
+
             return orderResponse;
         }
 
+        /// <summary>
+        /// Get single order record by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(OrderResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderResponse>> Find(int id)

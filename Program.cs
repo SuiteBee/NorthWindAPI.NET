@@ -50,6 +50,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind API", Version = "v1" });
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "NorthWindAPIAnnotation.xml"));
 });
 
 //Repositories
@@ -76,6 +77,7 @@ var mapperConfig = new MapperConfiguration(cfg =>
     cfg.AddProfile(new OrderRequestMap());
     cfg.AddProfile(new CustomerDtoMap());
     cfg.AddProfile(new CustomerRequestMap());
+    cfg.AddProfile(new CustomerResponseMap());
     cfg.AddProfile(new ProductDtoMap());
     cfg.AddProfile(new OrderResponseMap());
     cfg.AddProfile(new UserDtoMap());

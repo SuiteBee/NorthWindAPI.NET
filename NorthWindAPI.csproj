@@ -7,6 +7,8 @@
     <UserSecretsId>811cc548-869c-4317-8461-ba41237841dd</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <DockerfileContext>.</DockerfileContext>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>NorthWindAPIAnnotation.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

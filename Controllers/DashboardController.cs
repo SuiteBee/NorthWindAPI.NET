@@ -18,6 +18,12 @@ namespace NorthWindAPI.Controllers
         private readonly IMapper _mapper = mapper;
         private readonly ILogger<DashboardController> _logger = logger;
 
+        /// <summary>
+        /// Get chart data for dashboard display
+        /// </summary>
+        [ProducesResponseType(typeof(ChartsResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<ChartsResponse>> Charts()

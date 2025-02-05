@@ -49,7 +49,7 @@ namespace NorthWindAPI.Services
             return uniqueCountryRegions.ToList();
         }
 
-        public async Task<CustomerDto> ProcessNewCustomer(NewCustomerRequest newCustomer)
+        public async Task<CustomerDto> ProcessNewCustomer(CustomerRequest newCustomer)
         {
             var toInsert = _mapper.Map<Customer>(newCustomer);
             _mapper.Map(newCustomer.ContactInfo, toInsert);

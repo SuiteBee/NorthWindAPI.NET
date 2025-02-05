@@ -1,6 +1,8 @@
-﻿namespace NorthWindAPI.Controllers.Models.Requests
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace NorthWindAPI.Controllers.Models.Responses
 {
-    public class AddressRequest
+    public class AddressResponse
     {
         /// <summary>
         /// Street name and number
@@ -27,5 +29,15 @@
         /// </summary>
         /// <example>North America</example>
         public required string Region { get; set; }
+
+        [SetsRequiredMembers]
+        public AddressResponse()
+        {
+            Street = "";
+            City = "";
+            PostalCode = "";
+            Country = "";
+            Region = "";
+        }
     }
 }
