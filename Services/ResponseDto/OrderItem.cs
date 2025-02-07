@@ -4,6 +4,7 @@ namespace NorthWindAPI.Services.ResponseDto
 {
     public class OrderItemDto
     {
+        public int ProductId { get; set; }
         public required string ProductName { get; set; }
         public required string CategoryName { get; set; }
         public decimal ItemPrice { get; set; }

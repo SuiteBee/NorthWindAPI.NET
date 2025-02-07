@@ -108,22 +108,5 @@ namespace NorthWindAPI.Data.Repositories
         }
 
         #endregion
-
-
-
-        //public async Task<List<object>> FindFullOrder(int id)
-        //{
-        //    var sqlRaw =
-        //        "SELECT * " +
-        //        "FROM " +
-        //        "FROM [Order] o " +
-        //        "JOIN [Employee] e ON e.Id = o.EmployeeId " +
-        //        "JOIN [OrderDetail] od ON o.Id = od.OrderId " +
-        //        "JOIN [Product] p ON p.Id = od.ProductId " +
-        //        $"WHERE o.Id = {id}";
-
-        //    var query = FormattableStringFactory.Create(sqlRaw);
-        //    return await _context.Database.SqlQuery<object>(query).ToListAsync();
-        //}
     }
 }

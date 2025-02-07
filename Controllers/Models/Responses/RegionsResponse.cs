@@ -7,7 +7,7 @@ namespace NorthWindAPI.Controllers.Models.Responses
         /// <summary>
         /// List of global regions
         /// </summary>
-        /// <example>Central America,Western Europe,British Isles</example>
+        /// <example>"Central America,Western Europe,British Isles"</example>
         public IEnumerable<RegionDto> Regions { get; set; } = new List<RegionDto>();
     }
 }

@@ -137,10 +137,6 @@ namespace NorthWindAPI.Services
                 toInsertDetail.UnitPrice = prod.UnitPrice - Math.Round(prod.UnitPrice * itemDiscount, 2);
 
                 await _orderRepository.InsertDetail(toInsertDetail);
-
-                //Update product stock - subtract quantity ordered from units in stock
-                prod.UnitsInStock -= detail.Quantity;
-                await _productRepository.UpdateProduct(prod.Id, prod);
             }
 
             return await FindOrder(inserted.Id);
@@ -182,22 +178,6 @@ namespace NorthWindAPI.Services
 
         public async Task<bool> RemoveOrder(int orderId)
         {
-            try
-            {
-                //Update product stock - subtract quantity ordered from units in stock
-                var orderDetails = await _orderRepository.FindDetail(orderId);
-                foreach (var detail in orderDetails)
-                {
-                    Product prod = await _productRepository.FindProduct(detail.ProductId);
-                    prod.UnitsInStock += detail.Quantity;
-                    await _productRepository.UpdateProduct(prod.Id, prod);
-                }
-            }
-            catch
-            {
-                throw new HttpRequestException("Order Service: Error re-stocking inventory.");
-            }
-
             return await _orderRepository.DeleteOrder(orderId);
         }
 

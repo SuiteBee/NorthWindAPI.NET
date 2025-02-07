@@ -27,6 +27,7 @@ namespace NorthWindAPI.Services.Mappers
 
 
             CreateMap<Product, OrderItemDto>()
+                .ForMember(d => d.ProductId, o => o.MapFrom(s => s.Id))
                 .ForMember(d => d.ItemPrice, o => o.MapFrom(s => s.UnitPrice));
 
             CreateMap<Category, OrderItemDto>();

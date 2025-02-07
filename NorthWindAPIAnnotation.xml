@@ -215,7 +215,7 @@
             <summary>
             List of order ID's
             </summary>
-            <example>1,2,3</example>
+            <example>[1,2,3]</example>
         </member>
         <member name="P:NorthWindAPI.Controllers.Models.Requests.ShipRequest.ShipDate">
             <summary>
@@ -399,7 +399,7 @@
             <summary>
             List of global regions
             </summary>
-            <example>Central America,Western Europe,British Isles</example>
+            <example>"Central America,Western Europe,British Isles"</example>
         </member>
         <member name="P:NorthWindAPI.Controllers.Models.Responses.ShippingResponse.CarrierId">
             <summary>
@@ -796,21 +796,24 @@
             Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
             </summary>
             <param name="id"></param>
-            <returns></returns>
         </member>
         <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.RemoveEntityAsync(System.Int32)">
             <summary>
             Delete entity and save changes to database
             </summary>
             <param name="id"></param>
-            <returns></returns>
         </member>
         <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.RemoveDependentEntityAsync(System.Int32)">
             <summary>
             Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
             </summary>
             <param name="id"></param>
-            <returns></returns>
+        </member>
+        <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.UpdateMultipleEntityAsync(System.Collections.Generic.IEnumerable{`0})">
+            <summary>
+            Updates multiple entities before saving because EntityFramework doesn't handle many single updates well
+            </summary>
+            <param name="entities"></param>
         </member>
         <member name="M:NorthWindAPI.Data.Repositories.OrderRepository.DeleteOrder(System.Int32)">
             <summary>

@@ -38,7 +38,6 @@ namespace NorthWindAPI.Data.Repositories
         /// Delete entity and save changes to database
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<bool> RemoveEntityAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
@@ -54,7 +53,7 @@ namespace NorthWindAPI.Data.Repositories
             }
             catch
             {
-                return true;
+                return false;
             }
 
             return true;
@@ -64,7 +63,6 @@ namespace NorthWindAPI.Data.Repositories
         /// Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
         public async Task<bool> RemoveDependentEntityAsync(int id)
         {
             var entity = await _dbSet.FindAsync(id);
@@ -98,7 +96,7 @@ namespace NorthWindAPI.Data.Repositories
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!await _dbSet.AnyAsync(x => x.Id == id))
                 {
@@ -106,11 +104,31 @@ namespace NorthWindAPI.Data.Repositories
                 }
                 else
                 {
-                    throw;
+                    throw new Exception(ex.Message + " : Error updating entity");
                 }
             }
 
             return await _dbSet.FindAsync(id);
+        }
+
+        /// <summary>
+        /// Updates multiple entities before saving because EntityFramework doesn't handle many single updates well
+        /// </summary>
+        /// <param name="entities"></param>
+        public async Task UpdateMultipleEntityAsync(IEnumerable<T> entities)
+        {
+            var entityIdCollection = entities.Select(x => x.Id);
+            var entitiesToUpdate = _dbSet.Where(x => entityIdCollection.Contains(x.Id)).ToList();
+            entitiesToUpdate.ForEach(x => _dbSet.Entry(x).State = EntityState.Modified);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new Exception(ex.Message + " : Error updating multiple entity");
+            }
         }
     }
 }

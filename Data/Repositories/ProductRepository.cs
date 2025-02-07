@@ -76,6 +76,11 @@ namespace NorthWindAPI.Data.Repositories
             return await _baseProductRepo.UpdateEntityAsync(id, prod);
         }
 
+        public async Task UpdateMultipleProducts(IEnumerable<Product> prods)
+        {
+            await _baseProductRepo.UpdateMultipleEntityAsync(prods);
+        }
+
         #endregion
     }
 }

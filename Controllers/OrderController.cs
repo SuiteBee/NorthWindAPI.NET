@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
@@ -12,6 +13,7 @@ namespace NorthWindAPI.Controllers
     public class OrderController(
         IOrderService orderService,
         ICustomerService customerService,
+        IProductService productService,
         IUserService employeeService,
         IMapper mapper,
         ILogger<OrderController> logger
@@ -19,6 +21,7 @@ namespace NorthWindAPI.Controllers
     {
         private readonly IOrderService _orderService = orderService;
         private readonly ICustomerService _customerService = customerService;
+        private readonly IProductService _productService = productService;
         private readonly IUserService _employeeService = employeeService;
 
         private readonly IMapper _mapper = mapper;
@@ -119,6 +122,9 @@ namespace NorthWindAPI.Controllers
         {
             try
             {
+                //Update product stock - subtract quantity ordered from units in stock
+                await _productService.RemoveStock(newOrder.OrderDetail);
+
                 var order = await _orderService.ProcessNewOrder(newOrder);
 
                 if (order == null)
@@ -136,9 +142,9 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch
+            catch(Exception ex)
             {
-                return Forbid();
+                return Forbid(ex.Message);
             }
         }
 
@@ -259,10 +265,20 @@ namespace NorthWindAPI.Controllers
         [ProducesResponseType(typeof(NoContentResult), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(BadRequestResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(NotFoundResult), StatusCodes.Status404NotFound)]
         [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
+            var order = await _orderService.FindOrder(id);
+            if(order == null)
+            {
+                return NotFound();
+            }
+
+            //Update product stock - add quantity ordered from order to be deleted
+            await _productService.ReplaceStock(order.Items);
+
             var result = await _orderService.RemoveOrder(id);
             if (!result)
             {

@@ -65,7 +65,7 @@ namespace NorthWindAPI.Data.Repositories
         /// Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+
         public async Task<bool> RemoveDependentEntityAsync(string id)
         {
             var entity = await _dbSet.FindAsync(id);

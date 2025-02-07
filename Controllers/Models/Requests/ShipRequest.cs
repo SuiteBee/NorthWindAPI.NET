@@ -5,7 +5,7 @@
         /// <summary>
         /// List of order ID's
         /// </summary>
-        /// <example>1,2,3</example>
+        /// <example>[1,2,3]</example>
         public required List<int> OrderIds { get; set; }
         /// <summary>
         /// Date shipped
