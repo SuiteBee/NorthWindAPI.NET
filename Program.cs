@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NorthWindAPI.Config.Swagger;
 using NorthWindAPI.Controllers.Mappers;
 using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.Repositories;
@@ -55,6 +56,7 @@ builder.Services.AddSwaggerGen(c =>
         Version = "v1" 
     });
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "NorthWindAPIAnnotation.xml"));
+    c.DocumentFilter<RemoveSchemaFilter>();
 });
 
 //Repositories
