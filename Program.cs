@@ -103,7 +103,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //Enable CORS to allow anything from dev host
-app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000", "http://localhost:4173"));
 
 app.UseAuthentication();
 app.UseAuthorization();
