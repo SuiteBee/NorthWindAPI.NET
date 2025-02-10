@@ -49,7 +49,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Northwind API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { 
+        Title = "Northwind API", 
+        Description = "REST API backend for NorthWindWeb", 
+        Version = "v1" 
+    });
     c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "NorthWindAPIAnnotation.xml"));
 });
 
@@ -97,7 +101,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.DefaultModelsExpandDepth(-1);
+    });
 }
 
 app.UseHttpsRedirection();
