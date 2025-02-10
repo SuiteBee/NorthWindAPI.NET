@@ -62,8 +62,7 @@ Sourced from [GitHub Northwind SQLite3](https://github.com/jpwhite3/northwind-SQ
 
 Modifications Made:
 + Additional Tables for employee logins/passwords
-  - Auth(Id, RoleId, EmployeeId, Username, Hash)
-  - Role(Id, RoleName)
-
-Minor fix: 
-+ CustomerId's not matching Order table
+    - Auth(Id, RoleId, EmployeeId, Username, Hash)
+    - Role(Id, RoleName)
++ Minor fix
+    - CustomerId's not matching Order table
