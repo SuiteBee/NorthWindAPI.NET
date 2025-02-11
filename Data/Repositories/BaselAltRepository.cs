@@ -34,6 +34,14 @@ namespace NorthWindAPI.Data.Repositories
             return entity;
         }
 
+        public async Task<IEnumerable<T>> AddMultipleEntitiesAsync(IEnumerable<T> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+            await _context.SaveChangesAsync();
+
+            return entities;
+        }
+
         /// <summary>
         /// Delete entity and save changes to database
         /// </summary>

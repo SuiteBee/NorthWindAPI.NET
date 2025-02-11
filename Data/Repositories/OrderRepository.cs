@@ -69,9 +69,9 @@ namespace NorthWindAPI.Data.Repositories
 
         #region " POST "
 
-        public async Task<OrderDetail> InsertDetail(OrderDetail detail)
+        public async Task<IEnumerable<OrderDetail>> InsertDetails(IEnumerable<OrderDetail> details)
         {
-            return await _baseDetailRepo.AddEntityAsync(detail);
+            return await _baseDetailRepo.AddMultipleEntitiesAsync(details);
         }
 
         public async Task<Order> InsertOrder(Order order)

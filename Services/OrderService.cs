@@ -123,6 +123,7 @@ namespace NorthWindAPI.Services
             toInsert.RequiredDate = orderDate.AddDays(28).ToString(dateFormat);
 
             var inserted = await _orderRepository.InsertOrder(toInsert);
+            var details = new List<OrderDetail>();
 
             foreach (var detail in newOrder.OrderDetail)
             {
@@ -136,8 +137,10 @@ namespace NorthWindAPI.Services
                 toInsertDetail.Discount = (double)itemDiscount;
                 toInsertDetail.UnitPrice = prod.UnitPrice - Math.Round(prod.UnitPrice * itemDiscount, 2);
 
-                await _orderRepository.InsertDetail(toInsertDetail);
+                details.Add(toInsertDetail);
             }
+
+            await _orderRepository.InsertDetails(details);
 
             return await FindOrder(inserted.Id);
         }

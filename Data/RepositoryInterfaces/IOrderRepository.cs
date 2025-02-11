@@ -12,7 +12,7 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
         public Task<List<OrderDetail>> FindDetail(int orderId);
         public Task<Shipper> FindCarrier(int shipperId);
 
-        public Task<OrderDetail> InsertDetail(OrderDetail detail);
+        public Task<IEnumerable<OrderDetail>> InsertDetails(IEnumerable<OrderDetail> details);
         public Task<Order> InsertOrder(Order order);
 
         public Task<Order> UpdateOrder(int orderId, Order order);
