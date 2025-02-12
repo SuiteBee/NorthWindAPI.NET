@@ -20,10 +20,16 @@ namespace NorthWindAPI.Controllers
         /// </summary>
         /// <param name="credentials"></param>
         [ProducesResponseType(typeof(UserResponse), StatusCodes.Status202Accepted)]
+        [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         [HttpPost]
         public async Task<ActionResult<UserResponse>> Authenticate(AuthRequest credentials)
         {
+            if(string.IsNullOrEmpty(credentials.Usr) || (string.IsNullOrEmpty(credentials.Pwd)))
+            {
+                return BadRequest();
+            }
+
             var response = new UserResponse();
             var auth = await _authService.Authenticate(credentials.Usr, credentials.Pwd);
 
