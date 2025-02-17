@@ -35,5 +35,9 @@ namespace NorthWindAPI.Data.Repositories
             return await _baseCustomerRepo.UpdateEntityAsync(id, customer);
         }
 
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

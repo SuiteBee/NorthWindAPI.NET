@@ -114,35 +114,55 @@ namespace NorthWindAPI.Services
 
         public async Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder)
         {
-            var toInsert = _mapper.Map<Order>(newOrder);
-            _mapper.Map(newOrder.Address, toInsert);
+            var newOrderId = -1;
 
-            var orderDate = DateTime.Today;
-            var orderDateString = orderDate.ToString(dateFormat);
-            toInsert.OrderDate = orderDateString;
-            toInsert.RequiredDate = orderDate.AddDays(28).ToString(dateFormat);
-
-            var inserted = await _orderRepository.InsertOrder(toInsert);
-            var details = new List<OrderDetail>();
-
-            foreach (var detail in newOrder.OrderDetail)
+            //Write operations performed on multiple sources will require a transaction
+            using (var transaction = _orderRepository.BeginTransaction())
             {
-                Product prod = await _productRepository.FindProduct(detail.ProductId);
+                //Map request order model to resource
+                var toInsert = _mapper.Map<Order>(newOrder);
+                _mapper.Map(newOrder.Address, toInsert);
 
-                var toInsertDetail = _mapper.Map<OrderDetail>(detail);
-                toInsertDetail.Id = $"{inserted.Id}/{detail.ProductId}";
-                toInsertDetail.OrderId = inserted.Id;
+                //Set dates based on when request is made
+                var orderDate = DateTime.Today;
+                var orderDateString = orderDate.ToString(dateFormat);
+                toInsert.OrderDate = orderDateString;
+                toInsert.RequiredDate = orderDate.AddDays(28).ToString(dateFormat);
 
-                var itemDiscount = detail.Discount / 100;
-                toInsertDetail.Discount = (double)itemDiscount;
-                toInsertDetail.UnitPrice = prod.UnitPrice - Math.Round(prod.UnitPrice * itemDiscount, 2);
+                //Insert to order table and save
+                //We will need the inserted ID for order details
+                var inserted = await _orderRepository.InsertOrder(toInsert);
+                await _orderRepository.Save();
+                newOrderId = inserted.Id;
 
-                details.Add(toInsertDetail);
+                //Insert detail records for each product referencing inserted OrderID
+                var details = new List<OrderDetail>();
+                foreach (var detail in newOrder.OrderDetail)
+                {
+                    Product prod = await _productRepository.FindProduct(detail.ProductId);
+
+                    //Map request order detail model to resource
+                    var toInsertDetail = _mapper.Map<OrderDetail>(detail);
+                    toInsertDetail.Id = $"{inserted.Id}/{detail.ProductId}";
+                    toInsertDetail.OrderId = inserted.Id;
+
+                    //Calculate unit price based on system price instead of request
+                    var itemDiscount = detail.Discount / 100;
+                    toInsertDetail.Discount = (double)itemDiscount;
+                    toInsertDetail.UnitPrice = prod.UnitPrice - Math.Round(prod.UnitPrice * itemDiscount, 2);
+
+                    details.Add(toInsertDetail);
+                }
+
+                await _orderRepository.InsertDetails(details);
+
+                //Update product stock - subtract quantity ordered from units in stock
+                await RemoveStock(newOrder.OrderDetail);
+
+                _orderRepository.CommitTransaction(transaction);
             }
 
-            await _orderRepository.InsertDetails(details);
-
-            return await FindOrder(inserted.Id);
+            return await FindOrder(newOrderId);
         }
 
         #endregion
@@ -158,6 +178,9 @@ namespace NorthWindAPI.Services
             orderBase.ShippedDate = shipDateString;
 
             await _orderRepository.UpdateOrder(orderId, orderBase);
+
+            await _orderRepository.Save();
+
             return await FindOrder(orderId);
         }
 
@@ -167,21 +190,82 @@ namespace NorthWindAPI.Services
 
             foreach (int order in orders.OrderIds)
             {
-
                 var shipped = await MarkAsShipped(order, orders.ShipDate);
                 toReturn.Add(shipped);
             }
 
+            await _orderRepository.Save();
+
             return toReturn;
+        }
+
+        private async Task ReplaceStock(IEnumerable<OrderItemDto> orderItems)
+        {
+            try
+            {
+                var productsToUpdate = new List<Product>();
+
+                //Update product stock - add quantity ordered from order to be deleted
+                foreach (var item in orderItems)
+                {
+                    var prodBase = await _productRepository.FindProduct(item.ProductId);
+                    prodBase.UnitsInStock += item.Quantity;
+                    productsToUpdate.Add(prodBase);
+                }
+
+                await _productRepository.UpdateMultipleProducts(productsToUpdate);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + ": Order Service: Error re-stocking inventory.");
+            }
+        }
+
+        private async Task RemoveStock(IEnumerable<OrderDetailRequest> orderDetails)
+        {
+            try
+            {
+                var productsToUpdate = new List<Product>();
+
+                //Update product stock - subtract quantity ordered from units in stock
+                foreach (var detail in orderDetails)
+                {
+                    var prodBase = await _productRepository.FindProduct(detail.ProductId);
+                    prodBase.UnitsInStock -= detail.Quantity;
+                    productsToUpdate.Add(prodBase);
+                }
+
+                await _productRepository.UpdateMultipleProducts(productsToUpdate);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + ": Order Service: Error removing inventory.");
+            }
         }
 
         #endregion
 
         #region " DELETE "
 
-        public async Task<bool> RemoveOrder(int orderId)
+        public async Task RemoveOrder(int orderId)
         {
-            return await _orderRepository.DeleteOrder(orderId);
+            //Write operations performed on multiple sources will require a transaction
+            using (var transaction = _orderRepository.BeginTransaction())
+            {
+                var order = await FindOrder(orderId);
+                if (order == null)
+                {
+                    throw new Exception($"{orderId} does not exist.");
+                }
+
+                //Update product stock - add quantity ordered from order to be deleted
+                await ReplaceStock(order.Items);
+
+                //Remove pending details and order record
+                await _orderRepository.DeleteOrder(orderId);
+
+                 _orderRepository.CommitTransaction(transaction);
+            }
         }
 
         #endregion

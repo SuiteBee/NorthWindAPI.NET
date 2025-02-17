@@ -84,6 +84,7 @@ namespace NorthWindAPI.Services
                 user.Hash = newHash;
 
                 var newAuth = await _employeeRepository.UpdateUser(user.Id, user);
+                await _employeeRepository.Save();
                 return newAuth != null;
             }
 

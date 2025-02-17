@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
@@ -92,21 +93,43 @@ namespace NorthWindAPI.Data.Repositories
 
         #region " DELETE "
 
-        /// <summary>
-        /// Delete all associated detail records and delete parent record. Changes are saved when parent is removed.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<bool> DeleteOrder(int id)
+        public async Task DeleteOrder(int id)
         {
             List<OrderDetail> detailsToRemove = await FindDetail(id);
             foreach (OrderDetail detail in detailsToRemove)
             {
-                await _baseDetailRepo.RemoveDependentEntityAsync(detail.Id);
+                await _baseDetailRepo.RemoveEntityAsync(detail.Id);
             }
-            return await _baseOrderRepo.RemoveEntityAsync(id);
+            await _baseOrderRepo.RemoveEntityAsync(id);
         }
 
         #endregion
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            _context.Database.OpenConnection();
+            return _context.Database.BeginTransaction();
+        }
+
+        public void CommitTransaction(IDbContextTransaction transaction)
+        {
+            try
+            {
+                _context.SaveChanges();
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                _context.Database.CloseConnection();
+            }
+
+            _context.Database.CloseConnection();
+        }
+
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

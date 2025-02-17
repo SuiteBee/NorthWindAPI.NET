@@ -1,4 +1,5 @@
-﻿using NorthWindAPI.Data.Resources;
+﻿using Microsoft.EntityFrameworkCore;
+using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Data.RepositoryInterfaces
 {
@@ -9,5 +10,6 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
         public Task<Auth> GetUser(string usr);
         public Task<Role> GetRole(int id);
         public Task<Auth?> UpdateUser(int authId, Auth user);
+        public Task Save();
     }
 }

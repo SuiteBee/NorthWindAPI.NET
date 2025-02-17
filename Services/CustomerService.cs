@@ -2,6 +2,8 @@
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
+using NorthWindAPI.Infrastructure.Exceptions.Service;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -14,14 +16,23 @@ namespace NorthWindAPI.Services
         private readonly IMapper _mapper = mapper;
         private readonly ILogger<CustomerService> _logger = logger;
 
+        #region " SELECT "
+
         public async Task<CustomerDto> FindCustomer(string id)
         {
-            var customer = await _customerRepository.FindCustomer(id);
-            var toReturn = _mapper.Map<CustomerDto>(customer);
-            _mapper.Map(customer, toReturn.ContactInfo);
-            _mapper.Map(customer, toReturn.Address);
+            try
+            {
+                var customer = await _customerRepository.FindCustomer(id);
+                var toReturn = _mapper.Map<CustomerDto>(customer);
+                _mapper.Map(customer, toReturn.ContactInfo);
+                _mapper.Map(customer, toReturn.Address);
 
-            return toReturn;
+                return toReturn;
+            }
+            catch(EntityNotFoundException ex)
+            {
+                throw new CustomerNotFoundException($"Customer {id} not found");
+            }
         }
 
         public async Task<IEnumerable<CustomerDto>> ListCustomers()
@@ -49,6 +60,10 @@ namespace NorthWindAPI.Services
             return uniqueCountryRegions.ToList();
         }
 
+        #endregion
+
+        #region " INSERT "
+
         public async Task<CustomerDto> ProcessNewCustomer(CustomerRequest newCustomer)
         {
             var toInsert = _mapper.Map<Customer>(newCustomer);
@@ -56,9 +71,14 @@ namespace NorthWindAPI.Services
             _mapper.Map(newCustomer.Address, toInsert);
 
             var inserted = await _customerRepository.InsertCustomer(toInsert);
+            await _customerRepository.Save();
 
             return await FindCustomer(inserted.Id);
         }
+
+        #endregion
+
+        #region " UPDATE "
 
         public async Task<CustomerDto> Update(string id, CustomerDto customer)
         {
@@ -78,7 +98,11 @@ namespace NorthWindAPI.Services
 
 
             await _customerRepository.UpdateCustomer(id, cusBase);
+            await _customerRepository.Save();
+
             return await FindCustomer(id);
         }
+
+        #endregion
     }
 }

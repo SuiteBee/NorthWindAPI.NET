@@ -82,5 +82,10 @@ namespace NorthWindAPI.Data.Repositories
         }
 
         #endregion
+
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }

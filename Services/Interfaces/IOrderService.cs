@@ -11,7 +11,7 @@ namespace NorthWindAPI.Services.Interfaces
         public Task<OrderDto> ProcessNewOrder(NewOrderRequest newOrder);
         public Task<OrderDto> MarkAsShipped(int orderId, string? shippedDate = null);
         public Task<IEnumerable<OrderDto>> MarkAsShipped(ShipRequest orders);
-        public Task<bool> RemoveOrder(int orderId);
+        public Task RemoveOrder(int orderId);
     }
 }
 

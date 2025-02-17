@@ -65,16 +65,6 @@ namespace NorthWindAPI.Controllers
                 return order;
             }).ToList();
 
-            //Opt for linq joins over loop and search
-            //foreach (OrderResponse order in orderResponse)
-            //{
-            //    var customerId = order.OrderedBy.Id;
-            //    order.OrderedBy = customers.First(x => x.Id == customerId);
-
-            //    var employeeId = order.CompletedBy.Id;
-            //    order.CompletedBy = employees.First(x => x.Id == employeeId);
-            //}
-
             return orderResponse;
         }
 
@@ -122,9 +112,6 @@ namespace NorthWindAPI.Controllers
         {
             try
             {
-                //Update product stock - subtract quantity ordered from units in stock
-                await _productService.RemoveStock(newOrder.OrderDetail);
-
                 var order = await _orderService.ProcessNewOrder(newOrder);
 
                 if (order == null)
@@ -270,21 +257,16 @@ namespace NorthWindAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {
-            var order = await _orderService.FindOrder(id);
-            if(order == null)
+            try
             {
-                return NotFound();
+                await _orderService.RemoveOrder(id);
+
+                return NoContent();
             }
-
-            //Update product stock - add quantity ordered from order to be deleted
-            await _productService.ReplaceStock(order.Items);
-
-            var result = await _orderService.RemoveOrder(id);
-            if (!result)
+            catch(Exception ex)
             {
-                return BadRequest();
+                return BadRequest(ex.Message);
             }
-            return NoContent();
         }
     }
 }

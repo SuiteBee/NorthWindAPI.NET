@@ -1,4 +1,5 @@
-﻿using NorthWindAPI.Data.Resources;
+﻿using Microsoft.EntityFrameworkCore;
+using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Data.RepositoryInterfaces
 {
@@ -8,5 +9,6 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
         public Task<IEnumerable<Customer>> AllCustomers();
         public Task<Customer> InsertCustomer(Customer customer);
         public Task<Customer> UpdateCustomer(string id, Customer customer);
+        public Task Save();
     }
 }

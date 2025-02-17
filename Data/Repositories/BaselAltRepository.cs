@@ -29,70 +29,31 @@ namespace NorthWindAPI.Data.Repositories
         public async Task<T> AddEntityAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
-
             return entity;
         }
 
         public async Task<IEnumerable<T>> AddMultipleEntitiesAsync(IEnumerable<T> entities)
         {
             await _dbSet.AddRangeAsync(entities);
-            await _context.SaveChangesAsync();
-
             return entities;
         }
 
-        /// <summary>
-        /// Delete entity and save changes to database
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<bool> RemoveEntityAsync(string id)
+        public async Task RemoveEntityAsync(string id)
         {
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
-                return false;
-            }
-
-            try
-            {
-                _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
-                return false;
-            }
-
-
-            return true;
-        }
-
-        /// <summary>
-        /// Deletes entity and does not save the changes. Call this method to delete all dependencies and finish with RemoveEntityAsync()
-        /// </summary>
-        /// <param name="id"></param>
-
-        public async Task<bool> RemoveDependentEntityAsync(string id)
-        {
-            var entity = await _dbSet.FindAsync(id);
-            if (entity == null)
-            {
-                return false;
+                throw new Exception($"{id} does not exist.");
             }
 
             try
             {
                 _dbSet.Remove(entity);
             }
-            catch
+            catch(Exception ex)
             {
-                return false;
+                throw new Exception(ex.Message);
             }
-
-
-            return true;
         }
 
         public async Task<T?> UpdateEntityAsync(string id, T entity)
@@ -104,24 +65,7 @@ namespace NorthWindAPI.Data.Repositories
 
             _dbSet.Entry(entity).State = EntityState.Modified;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await _dbSet.AnyAsync(x => x.Id == id))
-                {
-                    return entity;
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
             return await _dbSet.FindAsync(id);
         }
-
     }
 }

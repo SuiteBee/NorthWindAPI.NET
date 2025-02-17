@@ -6,8 +6,7 @@
         public Task<T?> FindEntityAsync(int id);
         public Task<T> AddEntityAsync(T entity);
         public Task<IEnumerable<T>> AddMultipleEntitiesAsync(IEnumerable<T> entities);
-        public Task<bool> RemoveEntityAsync(int id);
-        public Task<bool> RemoveDependentEntityAsync(int id);
+        public Task RemoveEntityAsync(int id);
         public Task<T?> UpdateEntityAsync(int id, T entity);
         public Task UpdateMultipleEntityAsync(IEnumerable<T> entities);
 

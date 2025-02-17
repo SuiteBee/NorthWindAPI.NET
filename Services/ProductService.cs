@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.Execution;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
@@ -21,6 +20,9 @@ namespace NorthWindAPI.Services
             _mapper = mapper;
             _logger = logger;
         }
+
+        #region " SELECT "
+
         public async Task<IEnumerable<ProductDto>> ListProducts()
         {
             var productList = await _productRepository.AllProducts();
@@ -63,12 +65,16 @@ namespace NorthWindAPI.Services
             return prodDto;
         }
 
+        #endregion
+
+        #region " UPDATE "
         public async Task<ProductDto> PriceUpdate(int id, PriceRequest price)
         {
             var prodBase = await _productRepository.FindProduct(id);
             prodBase.UnitPrice = price.ItemPrice;
 
             await _productRepository.UpdateProduct(id, prodBase);
+            await _productRepository.Save();
             return await FindProduct(id);
         }
 
@@ -78,51 +84,8 @@ namespace NorthWindAPI.Services
             prodBase.UnitsInStock = stock.StockAmt;
 
             await _productRepository.UpdateProduct(id, prodBase);
+            await _productRepository.Save();
             return await FindProduct(id);
-        }
-
-        public async Task RemoveStock(IEnumerable<OrderDetailRequest> orderDetails)
-        {
-            try
-            {
-                var productsToUpdate = new List<Product>();
-
-                //Update product stock - subtract quantity ordered from units in stock
-                foreach (var detail in orderDetails)
-                {
-                    var prodBase = await _productRepository.FindProduct(detail.ProductId);
-                    prodBase.UnitsInStock -= detail.Quantity;
-                    productsToUpdate.Add(prodBase);
-                }
-
-                await _productRepository.UpdateMultipleProducts(productsToUpdate);
-            }
-            catch(Exception ex)
-            {
-                throw new Exception(ex.Message + ": Order Service: Error removing inventory.");
-            }
-        }
-
-        public async Task ReplaceStock(IEnumerable<OrderItemDto> orderItems)
-        {
-            try
-            {
-                var productsToUpdate = new List<Product>();
-
-                //Update product stock - add quantity ordered from order to be deleted
-                foreach (var item in orderItems)
-                {
-                    var prodBase = await _productRepository.FindProduct(item.ProductId);
-                    prodBase.UnitsInStock += item.Quantity;
-                    productsToUpdate.Add(prodBase);
-                }
-
-                await _productRepository.UpdateMultipleProducts(productsToUpdate);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.Message + ": Order Service: Error re-stocking inventory.");
-            }
         }
 
         public async Task<ProductDto> Update(int id, ProductRequest prod)
@@ -132,7 +95,10 @@ namespace NorthWindAPI.Services
             prodBase.UnitPrice = prod.ItemPrice;
 
             await _productRepository.UpdateProduct(id, prodBase);
+            await _productRepository.Save();
             return await FindProduct(id);
         }
+
+        #endregion
     }
 }

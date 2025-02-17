@@ -1,4 +1,5 @@
-﻿using NorthWindAPI.Data.Resources;
+﻿using Microsoft.EntityFrameworkCore.Storage;
+using NorthWindAPI.Data.Resources;
 
 namespace NorthWindAPI.Data.RepositoryInterfaces
 {
@@ -17,6 +18,10 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
 
         public Task<Order> UpdateOrder(int orderId, Order order);
 
-        public Task<bool> DeleteOrder(int id);
+        public Task DeleteOrder(int id);
+
+        public IDbContextTransaction BeginTransaction();
+        public void CommitTransaction(IDbContextTransaction transaction);
+        public Task Save();
     }
 }

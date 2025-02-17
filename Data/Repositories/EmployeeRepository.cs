@@ -51,5 +51,10 @@ namespace NorthWindAPI.Data.Repositories
         {
             return await _baseAuthRepo.UpdateEntityAsync(authId, user);
         }
+
+        public async Task Save()
+        {
+            await _context.SaveChangesAsync();
+        }
     }
 }
