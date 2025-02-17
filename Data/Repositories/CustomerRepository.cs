@@ -1,6 +1,8 @@
 ﻿using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Infrastructure.Exceptions.Base;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
 
 namespace NorthWindAPI.Data.Repositories
 {
@@ -17,22 +19,51 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<Customer?> FindCustomer(string id)
         {
-            return await _baseCustomerRepo.FindEntityAsync(id);
+            try
+            {
+                return await _baseCustomerRepo.FindEntityAsync(id);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                throw new CustomerNotFoundException($"Customer {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Customer>> AllCustomers()
         {
-            return await _baseCustomerRepo.ReturnEntityListAsync();
+            try
+            {
+                return await _baseCustomerRepo.ReturnEntityListAsync();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                throw new CustomerNotFoundException($"Customers {ex.Message}");
+            }
+
         }
 
-        public async Task<Customer> InsertCustomer(Customer customer)
+        public Customer InsertCustomer(Customer customer)
         {
-            return await _baseCustomerRepo.AddEntityAsync(customer);
+            try
+            {
+                return _baseCustomerRepo.AddEntity(customer);
+            }
+            catch (EntityNotCreatedException ex)
+            {
+                throw new CustomerNotCreatedException($"Customer {ex.Message}");
+            }
         }
 
-        public async Task<Customer> UpdateCustomer(string id, Customer customer)
+        public Customer UpdateCustomer(string id, Customer customer)
         {
-            return await _baseCustomerRepo.UpdateEntityAsync(id, customer);
+            try
+            {
+                return _baseCustomerRepo.UpdateEntity(id, customer);
+            }
+            catch (EntityNotUpdatedException ex)
+            {
+                throw new CustomerNotUpdatedException($"Customer {ex.Message}");
+            }
         }
 
         public async Task Save()

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
+using NorthWindAPI.Infrastructure.Exceptions.Base;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -26,14 +28,16 @@ namespace NorthWindAPI.Controllers
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<IEnumerable<CustomerResponse>>> All()
         {
-            var customers = await _customerService.ListCustomers();
-            if (customers == null || !customers.Any())
+            try
             {
-                return NotFound();
+                var customers = await _customerService.ListCustomers();
+                var response = _mapper.Map<IEnumerable<CustomerResponse>>(customers);
+                return response.ToList();
             }
-
-            var response = _mapper.Map<IEnumerable<CustomerResponse>>(customers);
-            return response.ToList();
+            catch(CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>
@@ -47,14 +51,16 @@ namespace NorthWindAPI.Controllers
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CustomerResponse>> Find(string id)
         {
-            var customer = await _customerService.FindCustomer(id);
-            if (customer == null)
+            try
             {
-                return NotFound();
+                var customer = await _customerService.FindCustomer(id);
+                var response = _mapper.Map<CustomerResponse>(customer);
+                return response;
             }
-
-            var response = _mapper.Map<CustomerResponse>(customer);
-            return response;
+            catch(CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>
@@ -67,14 +73,16 @@ namespace NorthWindAPI.Controllers
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<RegionsResponse>> Regions()
         {
-            var customerRegions = await _customerService.CustomerRegions();
-            if (customerRegions == null || !customerRegions.Any())
+            try
             {
-                return NotFound();
+                var customerRegions = await _customerService.CustomerRegions();
+                RegionsResponse response = new() { Regions = customerRegions };
+                return response;
             }
-
-            RegionsResponse response = new() { Regions = customerRegions };
-            return response;
+            catch(CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>
@@ -89,23 +97,21 @@ namespace NorthWindAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<CustomerResponse>> Create(CustomerRequest newCustomer)
         {
-            var customer = new CustomerDto();
             try
             {
-                customer = await _customerService.ProcessNewCustomer(newCustomer);
+                var customer = await _customerService.ProcessNewCustomer(newCustomer);
 
-                if (customer == null)
-                {
-                    return BadRequest();
-                }
+                var response = _mapper.Map<CustomerResponse>(customer);
+                return response;
             }
-            catch
+            catch(CustomerNotCreatedException ex)
             {
-                return Forbid();
+                return BadRequest(ex.Message);
             }
-
-            var response = _mapper.Map<CustomerResponse>(customer);
-            return response;
+            catch(Exception ex)
+            {
+                return Forbid(ex.Message);
+            }
         }
 
         /// <summary>
@@ -121,26 +127,30 @@ namespace NorthWindAPI.Controllers
         [ProducesResponseType(typeof(UnauthorizedResult), StatusCodes.Status401Unauthorized)]
         public async Task<ActionResult<CustomerResponse>> Update(string id, CustomerRequest existingCustomer)
         {
-            var customer = new CustomerDto();
-
             try
             {
                 var toUpdate = _mapper.Map<CustomerDto>(existingCustomer);
+                var customer = await _customerService.Update(id, toUpdate);
 
-                if (id != toUpdate.Id)
-                {
-                    return BadRequest();
-                }
-
-                customer = await _customerService.Update(id, toUpdate);
+                var response = _mapper.Map<CustomerResponse>(customer);
+                return response;
             }
-            catch
+            catch(CustomerNotFoundException ex)
             {
-                return Forbid();
+                return NotFound(ex.Message);
             }
-
-            var response = _mapper.Map<CustomerResponse>(customer);
-            return response;
+            catch(CustomerNotUpdatedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(EntityIdentifierMismatchException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return Forbid(ex.Message);
+            }
         }
     }
 }

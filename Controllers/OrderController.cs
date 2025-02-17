@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Controllers.Models.Responses;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
 using NorthWindAPI.Services.Interfaces;
 
 namespace NorthWindAPI.Controllers
@@ -21,7 +21,6 @@ namespace NorthWindAPI.Controllers
     {
         private readonly IOrderService _orderService = orderService;
         private readonly ICustomerService _customerService = customerService;
-        private readonly IProductService _productService = productService;
         private readonly IUserService _employeeService = employeeService;
 
         private readonly IMapper _mapper = mapper;
@@ -37,35 +36,45 @@ namespace NorthWindAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderResponse>>> All()
         {
-            var orders = await _orderService.ListOrders();
-            var customers = await _customerService.ListCustomers();
-            var employees = await _employeeService.ListEmployees();
-
-            //Map initial Order list
-            var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
-            var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
-            var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
-
-            if (orderResponse == null || orderResponse.Count == 0)
+            try
             {
-                return NotFound();
+                var orders = await _orderService.ListOrders();
+                var customers = await _customerService.ListCustomers();
+                var employees = await _employeeService.ListEmployees();
+
+                //Map initial Order list
+                var orderResponse = _mapper.Map<List<OrderResponse>>(orders);
+                var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
+                var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
+
+                //Join customers on ID and return order list with customer info complete
+                orderResponse = orderResponse.Join(customerResponse, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
+                {
+                    order.OrderedBy = customer;
+                    return order;
+                }).ToList();
+
+                //Join employees on ID and return order list with employee info complete
+                orderResponse = orderResponse.Join(employeeResponse, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
+                {
+                    order.CompletedBy = employee;
+                    return order;
+                }).ToList();
+
+                return orderResponse;
             }
-
-            //Join customers on ID and return order list with customer info complete
-            orderResponse = orderResponse.Join(customerResponse, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
+            catch(OrderNotFoundException ex) 
             {
-                order.OrderedBy = customer;
-                return order;
-            }).ToList();
-
-            //Join employees on ID and return order list with employee info complete
-            orderResponse = orderResponse.Join(employeeResponse, order => order.CompletedBy.Id, employee => employee.Id, (order, employee) =>
+                return NotFound(ex.Message);
+            }
+            catch(CustomerNotFoundException ex)
             {
-                order.CompletedBy = employee;
-                return order;
-            }).ToList();
-
-            return orderResponse;
+                return NotFound(ex.Message);
+            }
+            catch(EmployeeNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>
@@ -92,9 +101,17 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch
+            catch (OrderNotFoundException ex)
             {
-                return NotFound(id);
+                return NotFound(ex.Message);
+            }
+            catch (CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (EmployeeNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
 
@@ -113,12 +130,6 @@ namespace NorthWindAPI.Controllers
             try
             {
                 var order = await _orderService.ProcessNewOrder(newOrder);
-
-                if (order == null)
-                {
-                    return BadRequest();
-                }
-
                 var orderResponse = _mapper.Map<OrderResponse>(order);
 
                 var customer = await _customerService.FindCustomer(order.CustomerId);
@@ -129,7 +140,31 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch(Exception ex)
+            catch(OrderNotCreatedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (OrderDetailNotCreatedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (EmployeeNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ProductNotUpdatedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
             {
                 return Forbid(ex.Message);
             }
@@ -151,12 +186,6 @@ namespace NorthWindAPI.Controllers
             try
             {
                 var order = await _orderService.MarkAsShipped(id, shipDate);
-
-                if (order == null)
-                {
-                    return BadRequest();
-                }
-
                 var orderResponse = _mapper.Map<OrderResponse>(order);
 
                 var customer = await _customerService.FindCustomer(order.CustomerId);
@@ -167,9 +196,25 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch
+            catch (OrderNotUpdatedException ex)
             {
-                return Forbid();
+                return BadRequest(ex.Message);
+            }
+            catch (OrderNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (EmployeeNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Forbid(ex.Message);
             }
         }
 
@@ -197,11 +242,6 @@ namespace NorthWindAPI.Controllers
                 var customerResponse = _mapper.Map<List<CustomerResponse>>(customers);
                 var employeeResponse = _mapper.Map<List<EmployeeResponse>>(employees);
 
-                if (orderResponse == null || orderResponse.Count == 0)
-                {
-                    return NotFound();
-                }
-
                 //Join customers on ID and return order list with customer info complete
                 orderResponse = orderResponse.Join(customerResponse, order => order.OrderedBy.Id, customer => customer.Id, (order, customer) =>
                 {
@@ -218,9 +258,25 @@ namespace NorthWindAPI.Controllers
 
                 return orderResponse;
             }
-            catch
+            catch (OrderNotUpdatedException ex)
             {
-                return Forbid();
+                return BadRequest(ex.Message);
+            }
+            catch (OrderNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (CustomerNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (EmployeeNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Forbid(ex.Message);
             }
         }
 
@@ -234,15 +290,21 @@ namespace NorthWindAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<ShipOptionResponse>> Carriers()
         {
-            var carriers = await _orderService.Carriers();
-
-            if (carriers == null || carriers.ToList().Count == 0)
+            try
             {
-                return NotFound();
-            }
+                var carriers = await _orderService.Carriers();
 
-            ShipOptionResponse response = new() { Carriers = carriers };
-            return response;
+                ShipOptionResponse response = new() { Carriers = carriers };
+                return response;
+            }
+            catch(CarrierNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Forbid(ex.Message);
+            }
         }
 
         /// <summary>
@@ -263,9 +325,25 @@ namespace NorthWindAPI.Controllers
 
                 return NoContent();
             }
-            catch(Exception ex)
+            catch(OrderNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(OrderNotRemovedException ex)
             {
                 return BadRequest(ex.Message);
+            }
+            catch(ProductNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(ProductNotUpdatedException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return Forbid(ex.Message);
             }
         }
     }

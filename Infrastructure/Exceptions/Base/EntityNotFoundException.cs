@@ -1,4 +1,4 @@
-﻿namespace NorthWindAPI.Infrastructure.Exceptions.Repository
+﻿namespace NorthWindAPI.Infrastructure.Exceptions.Base
 {
     public class EntityNotFoundException : Exception
     {

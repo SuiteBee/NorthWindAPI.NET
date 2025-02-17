@@ -10,8 +10,8 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
         public Task<Product> FindProduct(int productId);
         public Task<Category> FindCategory(int categoryId);
         public Task<Supplier> FindSupplier(int supplierId);
-        public Task<Product> UpdateProduct(int id, Product prod);
-        public Task UpdateMultipleProducts(IEnumerable<Product> prods);
+        public Product UpdateProduct(int id, Product prod);
+        public void UpdateMultipleProducts(IEnumerable<Product> prods);
         public Task Save();
     }
 }

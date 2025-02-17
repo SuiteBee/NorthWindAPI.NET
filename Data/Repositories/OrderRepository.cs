@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Infrastructure.Exceptions.Base;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
 
 namespace NorthWindAPI.Data.Repositories
 {
@@ -23,17 +25,36 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<IEnumerable<Order>> AllOrders()
         {
-            return await _baseOrderRepo.ReturnEntityListAsync();
+            try
+            {
+                return await _baseOrderRepo.ReturnEntityListAsync();
+            }
+            catch(EntityNotFoundException ex)
+            {
+                throw new OrderNotFoundException($"Orders {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<OrderDetail>> AllDetails()
         {
-            return await _baseDetailRepo.ReturnEntityListAsync();
+            try
+            {
+                return await _baseDetailRepo.ReturnEntityListAsync();
+            }
+            catch (EntityNotFoundException ex)
+            {
+                throw new OrderDetailNotFoundException($"Details {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Shipper>> AllCarriers()
         {
-            return await _context.Shipper.ToListAsync();
+            var carriers = await _context.Shipper.ToListAsync();
+            if(carriers == null || carriers.Count == 0)
+            {
+                throw new CarrierNotFoundException($"Carriers not found");
+            }
+            return carriers;
         }
 
         #endregion
@@ -42,18 +63,35 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<Order?> FindOrder(int id)
         {
-            return await _baseOrderRepo.FindEntityAsync(id);
+            try
+            {
+                return await _baseOrderRepo.FindEntityAsync(id);
+            }
+            catch (EntityNotFoundException ex)
+            {
+                throw new OrderNotFoundException($"Order {ex.Message}");
+            }
         }
 
         public async Task<List<OrderDetail>> FindDetail(int orderId)
         {
-            return await QueryOrderDetails().Where(x => x.OrderId == orderId).ToListAsync();
+            var details = QueryOrderDetails().Where(x => x.OrderId == orderId);
+            if(details == null || !details.Any())
+            {
+                throw new OrderDetailNotFoundException($"Details for order {orderId} not found");
+            }
+            return await details.ToListAsync();
         }
 
 
         public async Task<Shipper> FindCarrier(int shipperId)
         {
-            return await QueryShippers().Where(x => x.Id == shipperId).FirstAsync();
+            var carriers = QueryShippers().Where(x => x.Id == shipperId);
+            if(carriers == null || !carriers.Any())
+            {
+                throw new CarrierNotFoundException($"Carrier {shipperId} not found");
+            }
+            return await carriers.FirstAsync();
         }
 
         private IQueryable<OrderDetail> QueryOrderDetails()
@@ -70,23 +108,45 @@ namespace NorthWindAPI.Data.Repositories
 
         #region " POST "
 
-        public async Task<IEnumerable<OrderDetail>> InsertDetails(IEnumerable<OrderDetail> details)
+        public IEnumerable<OrderDetail> InsertDetails(IEnumerable<OrderDetail> details)
         {
-            return await _baseDetailRepo.AddMultipleEntitiesAsync(details);
+            try
+            {
+                return _baseDetailRepo.AddMultipleEntities(details);
+            }
+            catch (EntityNotCreatedException ex)
+            {
+                throw new OrderDetailNotCreatedException($"Details {ex.Message}");
+            }
+            
         }
 
-        public async Task<Order> InsertOrder(Order order)
+        public Order InsertOrder(Order order)
         {
-            return await _baseOrderRepo.AddEntityAsync(order);
+            try
+            {
+                return _baseOrderRepo.AddEntity(order);
+            }
+            catch (EntityNotCreatedException ex)
+            {
+                throw new OrderNotCreatedException($"Order {ex.Message}");
+            }
         }
 
         #endregion
 
         #region " PUT "
 
-        public async Task<Order> UpdateOrder(int orderId, Order order)
+        public Order UpdateOrder(int orderId, Order order)
         {
-            return await _baseOrderRepo.UpdateEntityAsync(orderId, order);
+            try
+            {
+                return _baseOrderRepo.UpdateEntity(orderId, order);
+            }
+            catch (EntityNotUpdatedException ex)
+            {
+                throw new OrderNotUpdatedException($"Order {ex.Message}");
+            }
         }
 
         #endregion
@@ -95,12 +155,19 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task DeleteOrder(int id)
         {
-            List<OrderDetail> detailsToRemove = await FindDetail(id);
-            foreach (OrderDetail detail in detailsToRemove)
+            try
             {
-                await _baseDetailRepo.RemoveEntityAsync(detail.Id);
+                List<OrderDetail> detailsToRemove = await FindDetail(id);
+                foreach (OrderDetail detail in detailsToRemove)
+                {
+                    await _baseDetailRepo.RemoveEntityAsync(detail.Id);
+                }
+                await _baseOrderRepo.RemoveEntityAsync(id);
             }
-            await _baseOrderRepo.RemoveEntityAsync(id);
+            catch(Exception ex)
+            {
+                throw new OrderNotRemovedException($"Order not removed : {ex.Message}");
+            }
         }
 
         #endregion

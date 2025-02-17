@@ -2,8 +2,6 @@
 using NorthWindAPI.Controllers.Models.Requests;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
-using NorthWindAPI.Infrastructure.Exceptions.Repository;
-using NorthWindAPI.Infrastructure.Exceptions.Service;
 using NorthWindAPI.Services.Interfaces;
 using NorthWindAPI.Services.ResponseDto;
 
@@ -20,19 +18,12 @@ namespace NorthWindAPI.Services
 
         public async Task<CustomerDto> FindCustomer(string id)
         {
-            try
-            {
-                var customer = await _customerRepository.FindCustomer(id);
-                var toReturn = _mapper.Map<CustomerDto>(customer);
-                _mapper.Map(customer, toReturn.ContactInfo);
-                _mapper.Map(customer, toReturn.Address);
+            var customer = await _customerRepository.FindCustomer(id);
+            var toReturn = _mapper.Map<CustomerDto>(customer);
+            _mapper.Map(customer, toReturn.ContactInfo);
+            _mapper.Map(customer, toReturn.Address);
 
-                return toReturn;
-            }
-            catch(EntityNotFoundException ex)
-            {
-                throw new CustomerNotFoundException($"Customer {id} not found");
-            }
+            return toReturn;
         }
 
         public async Task<IEnumerable<CustomerDto>> ListCustomers()
@@ -70,7 +61,7 @@ namespace NorthWindAPI.Services
             _mapper.Map(newCustomer.ContactInfo, toInsert);
             _mapper.Map(newCustomer.Address, toInsert);
 
-            var inserted = await _customerRepository.InsertCustomer(toInsert);
+            var inserted = _customerRepository.InsertCustomer(toInsert);
             await _customerRepository.Save();
 
             return await FindCustomer(inserted.Id);
@@ -97,7 +88,7 @@ namespace NorthWindAPI.Services
             cusBase.Fax = customer.ContactInfo.Fax;
 
 
-            await _customerRepository.UpdateCustomer(id, cusBase);
+            _customerRepository.UpdateCustomer(id, cusBase);
             await _customerRepository.Save();
 
             return await FindCustomer(id);

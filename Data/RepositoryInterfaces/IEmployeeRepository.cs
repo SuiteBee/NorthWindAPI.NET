@@ -9,7 +9,7 @@ namespace NorthWindAPI.Data.RepositoryInterfaces
         public Task<IEnumerable<Employee>> AllEmployees();
         public Task<Auth> GetUser(string usr);
         public Task<Role> GetRole(int id);
-        public Task<Auth?> UpdateUser(int authId, Auth user);
+        public Auth UpdateUser(int authId, Auth user);
         public Task Save();
     }
 }

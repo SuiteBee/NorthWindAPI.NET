@@ -73,7 +73,7 @@ namespace NorthWindAPI.Services
             var prodBase = await _productRepository.FindProduct(id);
             prodBase.UnitPrice = price.ItemPrice;
 
-            await _productRepository.UpdateProduct(id, prodBase);
+            _productRepository.UpdateProduct(id, prodBase);
             await _productRepository.Save();
             return await FindProduct(id);
         }
@@ -83,7 +83,7 @@ namespace NorthWindAPI.Services
             var prodBase = await _productRepository.FindProduct(id);
             prodBase.UnitsInStock = stock.StockAmt;
 
-            await _productRepository.UpdateProduct(id, prodBase);
+            _productRepository.UpdateProduct(id, prodBase);
             await _productRepository.Save();
             return await FindProduct(id);
         }
@@ -94,7 +94,7 @@ namespace NorthWindAPI.Services
             prodBase.UnitsInStock = prod.StockAmt;
             prodBase.UnitPrice = prod.ItemPrice;
 
-            await _productRepository.UpdateProduct(id, prodBase);
+            _productRepository.UpdateProduct(id, prodBase);
             await _productRepository.Save();
             return await FindProduct(id);
         }

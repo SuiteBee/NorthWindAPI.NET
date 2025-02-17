@@ -2,6 +2,8 @@
 using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Infrastructure.Exceptions.Base;
+using NorthWindAPI.Infrastructure.Exceptions.Repository;
 
 namespace NorthWindAPI.Data.Repositories
 {
@@ -29,27 +31,58 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<Employee?> FindEmployee(int id)
         {
-            return await _baseEmployeeRepo.FindEntityAsync(id);
+            try
+            {
+                return await _baseEmployeeRepo.FindEntityAsync(id);
+            }
+            catch(EntityNotFoundException ex)
+            {
+                throw new EmployeeNotFoundException($"Employee {ex.Message}");
+            }
         }
 
         public async Task<IEnumerable<Employee>> AllEmployees()
         {
-            return await _baseEmployeeRepo.ReturnEntityListAsync();
+            try
+            {
+                return await _baseEmployeeRepo.ReturnEntityListAsync();
+            }
+            catch(EntityNotFoundException ex)
+            {
+                throw new EmployeeNotFoundException($"Employees {ex.Message}");
+            }
         }
 
         public async Task<Auth> GetUser(string usr)
         {
-            return await QueryAuth().Where(x => x.Username == usr).FirstAsync();
+            var users = QueryAuth().Where(x => x.Username == usr);
+            if(users == null || !users.Any())
+            {
+                throw new UserNotFoundException($"User {usr} not found");
+            }
+            return await users.FirstAsync();
         }
 
         public async Task<Role> GetRole(int id)
         {
-            return await QueryRole().Where(x => x.Id == id).FirstAsync();
+            var roles = QueryRole().Where(x => x.Id == id);
+            if(roles == null || !roles.Any())
+            {
+                throw new RoleNotFoundException($"Role {id} not found");
+            }
+            return await roles.FirstAsync();
         }
 
-        public async Task<Auth?> UpdateUser(int authId, Auth user)
+        public Auth UpdateUser(int authId, Auth user)
         {
-            return await _baseAuthRepo.UpdateEntityAsync(authId, user);
+            try
+            {
+                return _baseAuthRepo.UpdateEntity(authId, user);
+            }
+            catch (EntityNotUpdatedException ex)
+            {
+                throw new UserNotUpdatedException($"User {ex.Message}");
+            }
         }
 
         public async Task Save()

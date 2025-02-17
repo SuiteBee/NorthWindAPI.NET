@@ -69,11 +69,6 @@ namespace NorthWindAPI.Services
             var orderBase = await _orderRepository.FindOrder(orderId);
             var orderDetails = await _orderRepository.FindDetail(orderId);
 
-            if (orderBase == null)
-            {
-                throw new BadHttpRequestException("Resource does not exist");
-            }
-
             var orderDto = _mapper.Map<OrderDto>(orderBase);
             _mapper.Map(orderBase, orderDto.SendTo);
             _mapper.Map(orderBase, orderDto.SendTo.Address);
@@ -131,7 +126,7 @@ namespace NorthWindAPI.Services
 
                 //Insert to order table and save
                 //We will need the inserted ID for order details
-                var inserted = await _orderRepository.InsertOrder(toInsert);
+                var inserted = _orderRepository.InsertOrder(toInsert);
                 await _orderRepository.Save();
                 newOrderId = inserted.Id;
 
@@ -154,7 +149,7 @@ namespace NorthWindAPI.Services
                     details.Add(toInsertDetail);
                 }
 
-                await _orderRepository.InsertDetails(details);
+                _orderRepository.InsertDetails(details);
 
                 //Update product stock - subtract quantity ordered from units in stock
                 await RemoveStock(newOrder.OrderDetail);
@@ -177,7 +172,7 @@ namespace NorthWindAPI.Services
             var shipDateString = shipDate.ToString(dateFormat);
             orderBase.ShippedDate = shipDateString;
 
-            await _orderRepository.UpdateOrder(orderId, orderBase);
+            _orderRepository.UpdateOrder(orderId, orderBase);
 
             await _orderRepository.Save();
 
@@ -201,46 +196,32 @@ namespace NorthWindAPI.Services
 
         private async Task ReplaceStock(IEnumerable<OrderItemDto> orderItems)
         {
-            try
-            {
-                var productsToUpdate = new List<Product>();
+            var productsToUpdate = new List<Product>();
 
-                //Update product stock - add quantity ordered from order to be deleted
-                foreach (var item in orderItems)
-                {
-                    var prodBase = await _productRepository.FindProduct(item.ProductId);
-                    prodBase.UnitsInStock += item.Quantity;
-                    productsToUpdate.Add(prodBase);
-                }
-
-                await _productRepository.UpdateMultipleProducts(productsToUpdate);
-            }
-            catch (Exception ex)
+            //Update product stock - add quantity ordered from order to be deleted
+            foreach (var item in orderItems)
             {
-                throw new Exception(ex.Message + ": Order Service: Error re-stocking inventory.");
+                var prodBase = await _productRepository.FindProduct(item.ProductId);
+                prodBase.UnitsInStock += item.Quantity;
+                productsToUpdate.Add(prodBase);
             }
+
+            _productRepository.UpdateMultipleProducts(productsToUpdate);
         }
 
         private async Task RemoveStock(IEnumerable<OrderDetailRequest> orderDetails)
         {
-            try
-            {
-                var productsToUpdate = new List<Product>();
+            var productsToUpdate = new List<Product>();
 
-                //Update product stock - subtract quantity ordered from units in stock
-                foreach (var detail in orderDetails)
-                {
-                    var prodBase = await _productRepository.FindProduct(detail.ProductId);
-                    prodBase.UnitsInStock -= detail.Quantity;
-                    productsToUpdate.Add(prodBase);
-                }
-
-                await _productRepository.UpdateMultipleProducts(productsToUpdate);
-            }
-            catch (Exception ex)
+            //Update product stock - subtract quantity ordered from units in stock
+            foreach (var detail in orderDetails)
             {
-                throw new Exception(ex.Message + ": Order Service: Error removing inventory.");
+                var prodBase = await _productRepository.FindProduct(detail.ProductId);
+                prodBase.UnitsInStock -= detail.Quantity;
+                productsToUpdate.Add(prodBase);
             }
+
+            _productRepository.UpdateMultipleProducts(productsToUpdate);
         }
 
         #endregion
@@ -253,10 +234,6 @@ namespace NorthWindAPI.Services
             using (var transaction = _orderRepository.BeginTransaction())
             {
                 var order = await FindOrder(orderId);
-                if (order == null)
-                {
-                    throw new Exception($"{orderId} does not exist.");
-                }
 
                 //Update product stock - add quantity ordered from order to be deleted
                 await ReplaceStock(order.Items);

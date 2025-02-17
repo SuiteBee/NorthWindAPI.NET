@@ -784,7 +784,7 @@
             </summary>
             <example>Admin</example>
         </member>
-        <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.UpdateMultipleEntityAsync(System.Collections.Generic.IEnumerable{`0})">
+        <member name="M:NorthWindAPI.Data.Repositories.BaseRepository`1.UpdateMultipleEntity(System.Collections.Generic.IEnumerable{`0})">
             <summary>
             Updates multiple entities before saving because EntityFramework doesn't handle many single updates well
             </summary>

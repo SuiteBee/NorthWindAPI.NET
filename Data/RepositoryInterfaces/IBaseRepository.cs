@@ -3,12 +3,11 @@
     public interface IBaseRepository<T> where T : class
     {
         public Task<IEnumerable<T>> ReturnEntityListAsync();
-        public Task<T?> FindEntityAsync(int id);
-        public Task<T> AddEntityAsync(T entity);
-        public Task<IEnumerable<T>> AddMultipleEntitiesAsync(IEnumerable<T> entities);
+        public Task<T> FindEntityAsync(int id);
+        public T AddEntity(T entity);
         public Task RemoveEntityAsync(int id);
-        public Task<T?> UpdateEntityAsync(int id, T entity);
-        public Task UpdateMultipleEntityAsync(IEnumerable<T> entities);
+        public T UpdateEntity(int id, T entity);
+        public IEnumerable<T> UpdateMultipleEntity(IEnumerable<T> entities);
 
     }
 }

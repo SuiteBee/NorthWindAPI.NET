@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace NorthWindAPI.Infrastructure.Exceptions.Service
+﻿namespace NorthWindAPI.Infrastructure.Exceptions.Repository
 {
     public class CustomerNotFoundException : Exception
     {

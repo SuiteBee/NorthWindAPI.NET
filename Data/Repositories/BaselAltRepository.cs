@@ -2,6 +2,7 @@
 using NorthWindAPI.Data.Context;
 using NorthWindAPI.Data.RepositoryInterfaces;
 using NorthWindAPI.Data.Resources;
+using NorthWindAPI.Infrastructure.Exceptions.Base;
 
 namespace NorthWindAPI.Data.Repositories
 {
@@ -18,24 +19,48 @@ namespace NorthWindAPI.Data.Repositories
 
         public async Task<IEnumerable<T>> ReturnEntityListAsync()
         {
-            return await _dbSet.ToListAsync();
+            var entities = await _dbSet.ToListAsync();
+            if (entities == null || entities.Count == 0)
+            {
+                throw new EntityNotFoundException($"not found.");
+            }
+            return entities;
         }
 
-        public async Task<T?> FindEntityAsync(string id)
+        public async Task<T> FindEntityAsync(string id)
         {
-            return await _dbSet.FindAsync(id);
-        }
-
-        public async Task<T> AddEntityAsync(T entity)
-        {
-            await _dbSet.AddAsync(entity);
+            var entity = await _dbSet.FindAsync(id);
+            if (entity == null)
+            {
+                throw new EntityNotFoundException($"{id} not found.");
+            }
             return entity;
         }
 
-        public async Task<IEnumerable<T>> AddMultipleEntitiesAsync(IEnumerable<T> entities)
+        public T AddEntity(T entity)
         {
-            await _dbSet.AddRangeAsync(entities);
-            return entities;
+            try
+            {
+                var added = _dbSet.Add(entity);
+                return added.Entity;
+            }
+            catch (Exception ex)
+            {
+                throw new EntityNotCreatedException($"not added: {ex.Message}");
+            }
+        }
+
+        public IEnumerable<T> AddMultipleEntities(IEnumerable<T> entities)
+        {
+            try
+            {
+                _dbSet.AddRange(entities);
+                return entities;
+            }
+            catch(Exception ex)
+            {
+                throw new EntityNotCreatedException($"not added: {ex.Message}");
+            }
         }
 
         public async Task RemoveEntityAsync(string id)
@@ -43,29 +68,36 @@ namespace NorthWindAPI.Data.Repositories
             var entity = await _dbSet.FindAsync(id);
             if (entity == null)
             {
-                throw new Exception($"{id} does not exist.");
+                throw new EntityNotFoundException($"{id} not found.");
             }
 
             try
             {
                 _dbSet.Remove(entity);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new EntityNotRemovedException($"not deleted: {ex.Message}");
             }
         }
 
-        public async Task<T?> UpdateEntityAsync(string id, T entity)
+        public T UpdateEntity(string id, T entity)
         {
             if (id != entity.Id)
             {
-                return null;
+                throw new EntityIdentifierMismatchException($"ID does not match the ID in the request body.");
             }
 
-            _dbSet.Entry(entity).State = EntityState.Modified;
+            try
+            {
+                _dbSet.Entry(entity).State = EntityState.Modified;
 
-            return await _dbSet.FindAsync(id);
+                return _dbSet.Entry(entity).Entity;
+            }
+            catch (Exception ex)
+            {
+                throw new EntityNotUpdatedException($"not updated: {ex.Message}");
+            }
         }
     }
 }
