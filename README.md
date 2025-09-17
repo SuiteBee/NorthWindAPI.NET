@@ -30,7 +30,7 @@ All endpoints viewable [here](https://suitebee.github.io/NorthWindAPI.NET/#/)
 + Default password for all users is **Northwind1**
 + Includes password hashing for updating and storing user credentials
 + Stores password as unique hash in the database for each user despite passwords being identical
-+ At login, the API will genearte and return a JWT token to authorize future requests
++ At login, the API will generate and return a JWT token to authorize future requests
 + This token is valid for 30 minutes
 
 ![auth_table](https://github.com/user-attachments/assets/4bf3dbf2-5fc7-4ab6-b619-d4acc400b447)
